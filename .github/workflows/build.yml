@@ -1,0 +1,48 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore src/Universo.sln
+      
+    - name: Build
+      run: dotnet build src/Universo.sln --no-restore --configuration Release
+      
+    - name: Test
+      run: dotnet test src/Universo.sln --no-build --configuration Release --verbosity normal
+      
+    - name: Verify documentation
+      run: |
+        echo "Checking for bilingual documentation..."
+        for file in README.md ARCHITECTURE.md CONTRIBUTING.md SETUP.md ROADMAP.md; do
+          if [ -f "$file" ]; then
+            echo "✓ $file exists"
+            # Check for Russian version
+            ru_file="${file%.md}-RU.md"
+            if [ "$file" = "README.md" ]; then
+              ru_file="README-RU.md"
+            fi
+            if [ -f "$ru_file" ]; then
+              echo "✓ $ru_file exists"
+            else
+              echo "✗ Warning: $ru_file not found"
+            fi
+          fi
+        done
