@@ -17,21 +17,31 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: C# .NET 8 or later  
+**Primary Dependencies**: Blazor WebAssembly, ASP.NET Core, Supabase SDK (or abstraction layer)  
+**Storage**: Supabase (initial), architecture supports PostgreSQL/SQL Server via abstraction  
+**Testing**: xUnit or NUnit with integration test support  
+**Target Platform**: Web (Blazor WASM), cross-platform backend (.NET)
+**Project Type**: Web application (Blazor frontend + ASP.NET backend)  
+**Performance Goals**: [domain-specific, e.g., <200ms API response, 60fps UI or NEEDS CLARIFICATION]  
+**Constraints**: Bilingual docs required (EN/RU), package-based architecture, database abstraction  
+**Scale/Scope**: [domain-specific, e.g., multi-tenant, 10k+ users or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with `.specify/memory/constitution.md`:
+
+- [ ] **Monorepo Package Architecture**: Feature organized in `packages/` with proper naming and `base/` structure
+- [ ] **Frontend/Backend Separation**: Clear separation into `-frt` and `-srv` packages if both needed
+- [ ] **Base Implementation Pattern**: Using `base/` directory for primary implementation
+- [ ] **Bilingual Documentation**: English + Russian versions planned (README.md + README-RU.md)
+- [ ] **Independent Package Testability**: Each package can be tested independently
+- [ ] **GitHub Workflow Integration**: Issue/PR/Labels following `.github/instructions/` guidelines
+- [ ] **Multi-Database Preparedness**: Database access abstracted, not Supabase-specific
+
+Any violations MUST be justified in Complexity Tracking section below.
 
 ## Project Structure
 
@@ -56,43 +66,32 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+# Option: Web application (Blazor WebAssembly + ASP.NET Core)
+# Default structure for Universo Platformo CSharp
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+packages/
+├── [feature]-srv/           # Backend package
+│   └── base/                # Base implementation (Supabase initially)
+│       ├── Controllers/     # API controllers
+│       ├── Services/        # Business logic
+│       ├── Models/          # Data models
+│       ├── Repositories/    # Data access abstraction
+│       └── Tests/           # Package-specific tests
+│
+├── [feature]-frt/           # Frontend package
+│   └── base/                # Base implementation
+│       ├── Components/      # Blazor components
+│       ├── Pages/           # Blazor pages
+│       ├── Services/        # Frontend services (API clients)
+│       └── Tests/           # Component tests
+│
+└── [feature]-common/        # Shared contracts (if needed)
+    └── base/
+        ├── Contracts/       # API contracts/DTOs
+        └── Models/          # Shared models
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Following Universo Platformo CSharp monorepo package architecture as defined in the constitution. Features requiring both frontend and backend are split into `-frt` and `-srv` packages under `packages/` directory. Each package contains a `base/` directory for the primary implementation. Shared contracts may be placed in `-common` packages when needed. This structure supports independent package development, testing, and future multi-implementation scenarios.
 
 ## Complexity Tracking
 
