@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <!-- Language and Framework Settings -->
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <!-- Code Quality Settings -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>5</WarningLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    
+    <!-- Documentation Settings -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn> <!-- Missing XML comment for publicly visible type or member -->
+    
+    <!-- Build Settings -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    
+    <!-- Assembly Information -->
+    <Company>TeknokOmo</Company>
+    <Product>Universo Platformo C#</Product>
+    <Copyright>Copyright © 2025 TeknokOmo. Licensed under Omsk Open License.</Copyright>
+    <Authors>TeknokOmo</Authors>
+  </PropertyGroup>
+</Project>
