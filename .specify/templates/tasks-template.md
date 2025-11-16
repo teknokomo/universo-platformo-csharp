@@ -20,10 +20,12 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Universo Platformo CSharp**: `packages/[feature]-srv/base/`, `packages/[feature]-frt/base/`
+- Backend code: `packages/[feature]-srv/base/Controllers/`, `packages/[feature]-srv/base/Services/`, etc.
+- Frontend code: `packages/[feature]-frt/base/Components/`, `packages/[feature]-frt/base/Pages/`, etc.
+- Shared contracts: `packages/[feature]-common/base/Contracts/` (if needed)
+- Tests: `packages/[feature]-srv/base/Tests/`, `packages/[feature]-frt/base/Tests/`
+- Documentation: Create both `packages/[feature]-srv/README.md` and `packages/[feature]-srv/README-RU.md`
 
 <!-- 
   ============================================================================
@@ -48,9 +50,11 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Create package structure in `packages/[feature]-srv/base/` and `packages/[feature]-frt/base/`
+- [ ] T002 Initialize .NET solution and projects for backend and frontend packages
+- [ ] T003 [P] Configure EditorConfig and .NET formatting rules
+- [ ] T004 [P] Create bilingual README.md and README-RU.md files in package roots
+- [ ] T005 Setup database abstraction layer (repository pattern) in backend package
 
 ---
 
@@ -62,12 +66,13 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T006 Setup Supabase connection and database abstractions in `packages/[feature]-srv/base/Repositories/`
+- [ ] T007 [P] Implement ASP.NET Identity with Supabase integration
+- [ ] T008 [P] Setup API routing and middleware in backend package Controllers
+- [ ] T009 Create base models/entities in `packages/[feature]-srv/base/Models/`
+- [ ] T010 Configure error handling and logging infrastructure
+- [ ] T011 Setup environment configuration management (.NET Configuration)
+- [ ] T012 [P] Create bilingual API documentation (Swagger with EN/RU descriptions)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +88,21 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T013 [P] [US1] Contract test for [endpoint] in `packages/[feature]-srv/base/Tests/ContractTests/[Name]Tests.cs`
+- [ ] T014 [P] [US1] Integration test for [user journey] in `packages/[feature]-srv/base/Tests/IntegrationTests/[Name]Tests.cs`
+- [ ] T015 [P] [US1] Component test for [UI component] in `packages/[feature]-frt/base/Tests/[Component]Tests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T016 [P] [US1] Create [Entity1] model in `packages/[feature]-srv/base/Models/[Entity1].cs`
+- [ ] T017 [P] [US1] Create [Entity2] model in `packages/[feature]-srv/base/Models/[Entity2].cs`
+- [ ] T018 [US1] Implement [Repository] in `packages/[feature]-srv/base/Repositories/[Entity]Repository.cs` (depends on T016, T017)
+- [ ] T019 [US1] Implement [Service] in `packages/[feature]-srv/base/Services/[Service].cs` (depends on T018)
+- [ ] T020 [US1] Implement [Controller/API endpoint] in `packages/[feature]-srv/base/Controllers/[Controller].cs`
+- [ ] T021 [US1] Create Blazor component in `packages/[feature]-frt/base/Components/[Component].razor`
+- [ ] T022 [US1] Create Blazor page in `packages/[feature]-frt/base/Pages/[Page].razor`
+- [ ] T023 [US1] Add validation and error handling
+- [ ] T024 [US1] Update package README.md and README-RU.md with usage examples
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -150,12 +159,15 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
+- [ ] TXXX [P] Update bilingual documentation (README.md and README-RU.md) for all affected packages
+- [ ] TXXX Code cleanup and refactoring across packages
 - [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] TXXX [P] Additional unit tests (if requested) in package Tests/ directories
+- [ ] TXXX Security hardening and vulnerability scanning
+- [ ] TXXX Verify all packages can be built and tested independently
+- [ ] TXXX Verify database abstraction layer is properly implemented
+- [ ] TXXX Create GitHub Issue for this feature (if not already done) per `github-issues.md`
+- [ ] TXXX Update memory bank with architecture decisions
 
 ---
 

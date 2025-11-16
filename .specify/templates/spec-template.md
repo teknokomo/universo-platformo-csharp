@@ -113,3 +113,13 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+## Constitution Compliance Notes
+
+This specification must align with `.specify/memory/constitution.md`:
+
+- **Package Architecture**: Identify which packages needed (e.g., `[feature]-frt`, `[feature]-srv`, `[feature]-common`)
+- **Bilingual Documentation**: Plan for both English and Russian README files
+- **Database Abstraction**: If feature requires database access, specify abstraction requirements
+- **Independent Testability**: Ensure user stories can be tested independently within their packages
+- **GitHub Workflow**: Remember to create GitHub Issue before implementation
