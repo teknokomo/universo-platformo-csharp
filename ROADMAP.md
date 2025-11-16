@@ -424,6 +424,19 @@ To contribute to a specific feature:
 ## References / Ссылки
 
 - [React Version Repository](https://github.com/teknokomo/universo-platformo-react)
-- [ARCHITECTURE.md](ARCHITECTURE.md)
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Complete architecture documentation with database, session, UI, and i18n
+- [THREE_ENTITY_PATTERN.md](THREE_ENTITY_PATTERN.md) - Specification for hierarchical feature pattern
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SETUP.md](SETUP.md)
+- [GITHUB_SETUP.md](GITHUB_SETUP.md) - Manual GitHub labels and settings setup
+
+<details>
+<summary>In Russian</summary>
+
+- [Репозиторий версии React](https://github.com/teknokomo/universo-platformo-react)
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Полная документация архитектуры с базой данных, сеансами, UI и i18n
+- [THREE_ENTITY_PATTERN.md](THREE_ENTITY_PATTERN.md) - Спецификация паттерна иерархических функций
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SETUP.md](SETUP.md)
+- [GITHUB_SETUP.md](GITHUB_SETUP.md) - Ручная настройка меток и настроек GitHub
+</details>
