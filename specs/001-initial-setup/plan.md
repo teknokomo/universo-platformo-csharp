@@ -3,29 +3,31 @@
 **Branch**: `001-initial-setup` | **Date**: 2025-11-17 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-initial-setup/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
-
 ## Summary
 
-Set up the foundational structure for Universo Platformo CSharp with monorepo architecture, bilingual documentation, GitHub workflow integration, and database abstraction layer. Technical approach: .NET 8+ solution with Blazor WebAssembly frontend and ASP.NET Core backend, following constitution principles for package-based structure with base/ directories, Supabase initial implementation with EF Core abstraction for multi-DBMS support.
+Set up the foundational structure for Universo Platformo CSharp using Blazor WebAssembly (frontend) and ASP.NET Core (backend). This implementation establishes the monorepo structure with .NET Solution management, Clean/Onion Architecture, MudBlazor UI components, FluentValidation for data validation, hybrid caching strategy, built-in rate limiting, and comprehensive testing with xUnit and Testcontainers. All architectural decisions are based on 2024-2025 best practices research.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: C# .NET 8.0 or later  
-**Primary Dependencies**: Blazor WebAssembly, ASP.NET Core, MudBlazor, Supabase .NET SDK, Entity Framework Core  
-**Storage**: Supabase (initial), architecture supports PostgreSQL/SQL Server via EF Core abstraction  
-**Testing**: xUnit with Moq for mocking, integration tests for package contracts  
-**Target Platform**: Web (Blazor WASM client-side), cross-platform backend (.NET)
-**Project Type**: Monorepo web application (Blazor frontend packages + ASP.NET backend packages)  
-**Performance Goals**: Initial setup phase - focus on clean architecture, performance optimization in feature implementation  
-**Constraints**: Bilingual docs required (EN/RU with identical structure), package-based architecture, database abstraction, no docs/ folder, no AI agent config  
-**Scale/Scope**: Platform foundation supporting multi-tenant architecture, designed for extensibility with multiple DBMS and future scaling
+**Language/Version**: C# .NET 8.0 or later (latest LTS version)
+**Architecture Pattern**: Clean/Onion Architecture with layered approach
+**Primary Dependencies**:
+- **Frontend**: Blazor WebAssembly, MudBlazor (Material Design components)
+- **Backend**: ASP.NET Core Web API, FluentValidation
+- **Database**: Supabase with Repository Pattern + EF Core abstraction layer
+- **Caching**: IMemoryCache (local) + IDistributedCache/Redis (distributed)
+- **Testing**: xUnit with Testcontainers for real dependencies
+**Storage**: Supabase (initial), architecture supports PostgreSQL/SQL Server via abstraction  
+**Authentication**: Supabase JWT validation with ASP.NET Core JwtBearer middleware
+**Validation**: FluentValidation with automatic registration and pipeline integration
+**Error Handling**: IExceptionHandler (ASP.NET Core 8+) with ProblemDetails responses
+**Rate Limiting**: Built-in ASP.NET Core middleware with fixed window/token bucket algorithms
+**Target Platform**: Web (Blazor WASM client), cross-platform backend (.NET)
+**Project Type**: Monorepo web application (Blazor frontend + ASP.NET backend)  
+**Performance Goals**: <200ms API response time, 60fps UI rendering, <3s initial load
+**Constraints**: Bilingual docs required (EN/RU), package-based architecture, database abstraction, minimal JavaScript
+**Scale/Scope**: Multi-tenant ready, designed for 10k+ concurrent users with horizontal scaling
+**Monorepo Management**: Single .sln file with Directory.Build.props for shared configuration
 
 ## Constitution Check
 
@@ -33,22 +35,22 @@ Set up the foundational structure for Universo Platformo CSharp with monorepo ar
 
 Verify compliance with `.specify/memory/constitution.md`:
 
-**Initial Check (Before Phase 0)**: ✅ PASSED
+- [x] **Monorepo Package Architecture**: ✅ Feature organized in `packages/` with proper naming (`-frt`, `-srv`, `-common`) and `base/` structure
+- [x] **Frontend/Backend Separation**: ✅ Clear separation into `-frt` (Blazor WASM) and `-srv` (ASP.NET Core) packages
+- [x] **Base Implementation Pattern**: ✅ Using `base/` directory for primary Supabase implementation
+- [x] **Bilingual Documentation**: ✅ English + Russian versions planned (README.md + README-RU.md with identical structure)
+- [x] **Independent Package Testability**: ✅ Each package has its own Tests/ directory with xUnit and Testcontainers
+- [x] **GitHub Workflow Integration**: ✅ Issue/PR/Labels following `.github/instructions/` guidelines
+- [x] **Multi-Database Preparedness**: ✅ Repository Pattern with EF Core abstraction layer, not Supabase-specific
+- [x] **Three-Entity Domain Pattern**: ✅ Will apply to Clusters, Metaverses, and other hierarchical domains
+- [x] **Error Handling Architecture**: ✅ IExceptionHandler with structured ProblemDetails responses
+- [x] **Validation Strategy**: ✅ FluentValidation with centralized validator classes
+- [x] **Caching Strategy**: ✅ Hybrid approach (IMemoryCache + Redis IDistributedCache)
+- [x] **API Security & Rate Limiting**: ✅ Built-in ASP.NET Core rate limiting middleware
+- [x] **Async Initialization Pattern**: ✅ IHostedService for startup tasks planned
+- [x] **Template System Architecture**: ✅ Extensible package-based template system planned
 
-**Post-Design Check (After Phase 1)**:
-
-- [x] **Monorepo Package Architecture**: ✅ Structure documented in quickstart.md, packages/ directory ready
-- [x] **Frontend/Backend Separation**: ✅ Clear -frt/-srv package pattern defined in data-model.md and quickstart.md
-- [x] **Base Implementation Pattern**: ✅ base/ directory pattern documented and included in all examples
-- [x] **Bilingual Documentation**: ✅ Process documented in research.md, quickstart.md includes bilingual notes
-- [x] **Independent Package Testability**: ✅ xUnit testing framework selected, package isolation enforced
-- [x] **GitHub Workflow Integration**: ✅ Labels strategy in research.md, workflow documented
-- [x] **Multi-Database Preparedness**: ✅ Repository pattern defined in data-model.md, EF Core + Supabase abstraction
-- [x] **Three-Entity Domain Pattern**: ✅ Interfaces defined in data-model.md (IContainerEntity, IGroupEntity, IItemEntity)
-- [x] **Template System Architecture**: ✅ Extensibility planned, package-based approach supports templates
-- [x] **Async Initialization Pattern**: ✅ Health check endpoints defined, startup patterns planned
-
-**Gate Status**: ✅ PASSED - All 10 constitution principles satisfied. Design phase complete with no violations.
+**Status**: ✅ All constitution principles satisfied. No violations to justify.
 
 ## Project Structure
 
@@ -65,120 +67,95 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 
 ```text
-# Initial Project Setup Structure
+# Universo Platformo CSharp - Monorepo Structure
 
 /
 ├── .github/
-│   ├── instructions/           # Existing: GitHub workflow guidelines
-│   │   ├── github-issues.md
-│   │   ├── github-pr.md
-│   │   ├── github-labels.md
-│   │   └── i18n-docs.md
-│   └── ISSUE_TEMPLATE/         # To create: Issue templates
-│
-├── .specify/                   # Existing: Specification framework
-│   ├── memory/
-│   │   └── constitution.md
-│   ├── scripts/
-│   └── templates/
-│
-├── packages/                   # To create: Root for all feature packages
-│   └── .gitkeep               # Placeholder until first package created
-│
-├── src/                        # Existing: May contain early code
-│
-├── specs/                      # Existing: Feature specifications
-│   └── 001-initial-setup/
-│       ├── spec.md
-│       ├── plan.md
-│       ├── research.md         # Phase 0 output
-│       ├── data-model.md       # Phase 1 output
-│       ├── quickstart.md       # Phase 1 output
-│       └── contracts/          # Phase 1 output
-│
-├── .editorconfig               # To create: Code style configuration
-├── .gitignore                  # To update: .NET specific ignores
-├── Directory.Build.props       # To create: Shared MSBuild properties
-├── UniversoPlatformo.sln       # To create: Solution file
-├── README.md                   # To update: Project overview (English)
-├── README-RU.md                # To create: Project overview (Russian)
-├── CONTRIBUTING.md             # Existing: To update with C# specifics
-└── LICENSE.md                  # Existing
+│   ├── workflows/           # CI/CD pipelines
+│   └── instructions/        # GitHub workflow guidelines
+├── .specify/
+│   ├── memory/              # Constitution and memory bank
+│   ├── scripts/             # Workflow scripts
+│   └── templates/           # Document templates
+├── src/
+│   └── packages/            # All feature packages
+│       ├── core-srv/        # Core backend infrastructure
+│       │   └── base/
+│       │       ├── Middleware/
+│       │       ├── Exceptions/
+│       │       ├── Extensions/
+│       │       └── Tests/
+│       ├── core-frt/        # Core frontend infrastructure
+│       │   └── base/
+│       │       ├── Components/
+│       │       ├── Services/
+│       │       ├── Models/
+│       │       └── Tests/
+│       ├── auth-srv/        # Authentication backend
+│       │   └── base/
+│       │       ├── Controllers/
+│       │       ├── Services/
+│       │       ├── Repositories/
+│       │       ├── Validators/
+│       │       └── Tests/
+│       ├── auth-frt/        # Authentication frontend
+│       │   └── base/
+│       │       ├── Components/
+│       │       ├── Pages/
+│       │       └── Tests/
+│       └── [feature]-srv/   # Feature backend packages
+│           └── base/
+│               ├── Controllers/     # API endpoints
+│               ├── Services/        # Business logic
+│               ├── Models/          # Data models
+│               ├── Repositories/    # Data access (Repository Pattern)
+│               ├── Validators/      # FluentValidation validators
+│               ├── Exceptions/      # Custom exceptions
+│               └── Tests/           # xUnit + Testcontainers
+├── shared/
+│   └── Common/              # Shared utilities, DTOs, contracts
+├── specs/                   # Feature specifications
+├── tests/                   # Integration tests
+├── docs/                    # Future: separate repository
+├── UniversoPlatformo.sln    # Single solution file
+├── Directory.Build.props    # Shared build configuration
+├── .editorconfig            # Code style rules
+├── .gitignore
+├── README.md
+├── README-RU.md
+└── LICENSE.md
 ```
 
-**Structure Decision**: This initial setup creates the foundation for the Universo Platformo CSharp monorepo. The `packages/` directory will house all feature implementations following the `-frt`/`-srv`/`-common` naming convention with `base/` subdirectories. The .NET solution file provides workspace management. Documentation follows bilingual requirements. GitHub integration follows existing instructions. This structure enables future feature packages to be added incrementally while maintaining constitution compliance.
+**Structure Decision**: 
+- **Monorepo**: Single .NET solution (.sln) with Directory.Build.props for shared configuration
+- **Clean Architecture**: Domain → Application → Infrastructure → Presentation layers
+- **Package Organization**: Features split into `-frt` (Blazor), `-srv` (ASP.NET), `-common` (shared contracts)
+- **Base Pattern**: Each package has `base/` directory for primary Supabase implementation
+- **Testing**: Each package has Tests/ directory with xUnit and Testcontainers
+- **Infrastructure**: Added Validators/ and Exceptions/ directories per research best practices
+- **No circular dependencies**: Clear one-way dependency flow
+- **Independent testability**: Each package can be built, tested, and deployed independently
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+**Status**: ✅ No constitution violations identified.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| N/A | No violations | All constitution principles satisfied |
+All architectural decisions align with the constitution principles:
+- Monorepo package architecture properly structured
+- Frontend/backend clearly separated
+- Base implementation pattern used consistently
+- Bilingual documentation planned
+- Independent package testability ensured
+- GitHub workflow integration followed
+- Multi-database preparedness via abstraction layers
+- Error handling, validation, caching, and rate limiting aligned with constitution requirements
 
----
-
-## Phase Completion Status
-
-### Phase 0: Research & Design Decisions ✅
-- **Status**: Complete
-- **Output**: [research.md](./research.md)
-- **Key Decisions**:
-  - .NET 8+ solution structure with Directory.Build.props
-  - Blazor WebAssembly for frontend
-  - MudBlazor for Material Design UI
-  - Repository pattern over Supabase REST API
-  - Entity Framework Core for database abstraction
-  - xUnit + Moq for testing
-  - Bilingual documentation strategy
-
-### Phase 1: Design & Contracts ✅
-- **Status**: Complete
-- **Outputs**:
-  - [data-model.md](./data-model.md) - Core data models and interfaces
-  - [contracts/api-contracts.md](./contracts/api-contracts.md) - API specifications
-  - [quickstart.md](./quickstart.md) - Developer onboarding guide
-  - Updated agent context (copilot-instructions.md)
-- **Key Artifacts**:
-  - BaseEntity and three-entity pattern interfaces
-  - Repository abstraction interfaces
-  - Configuration models (Database, Supabase)
-  - API response and pagination models
-  - Health check and configuration endpoints
-  - Complete quickstart guide for developers
-
-### Phase 2: Implementation Planning (NOT IN SCOPE)
-- **Status**: Not started (per agent instructions)
-- **Note**: Phase 2 planning (tasks.md creation) is handled by `/speckit.tasks` command
-- **Next Command**: `/speckit.tasks` to break down implementation into actionable tasks
-
----
-
-## Implementation Readiness
-
-**Ready for Implementation**: ✅ Yes
-
-**Artifacts Generated**:
-1. ✅ spec.md - Feature specification
-2. ✅ plan.md - Implementation plan (this file)
-3. ✅ research.md - Technology decisions and research
-4. ✅ data-model.md - Data models and interfaces
-5. ✅ contracts/api-contracts.md - API specifications
-6. ✅ quickstart.md - Developer onboarding guide
-7. ✅ Agent context updated (copilot-instructions.md)
-
-**Constitution Compliance**: ✅ All 10 principles satisfied
-
-**Next Steps**:
-1. User should review all generated artifacts
-2. Run `/speckit.tasks` command to generate tasks.md
-3. Begin implementation following tasks
-4. Create GitHub Issues for tracking (per `.github/instructions/github-issues.md`)
-
----
-
-**Planning Complete**: 2025-11-17  
-**Planner**: speckit.plan agent  
-**Status**: ✅ Ready for task breakdown and implementation
+No additional complexity or justifications needed.
