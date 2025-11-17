@@ -174,7 +174,270 @@ packages/universo-components/
 - Blazor component tests using bUnit
 - Bilingual documentation complete
 
-### 1.3 Authentication System (Week 4)
+### 1.3 Cross-Cutting Infrastructure (Week 3-4)
+
+**Goal**: Implement foundational infrastructure patterns required by all packages
+
+#### Error Handling Infrastructure
+
+**Purpose**: Centralized error handling for consistent error responses and improved debugging
+
+**Components**:
+- Global exception middleware
+- Standard error response DTOs
+- Custom exception hierarchy
+- Blazor error boundary components
+- Structured logging configuration
+
+**Package**: `Universo.Common` (new shared package)
+
+**Structure**:
+```
+packages/universo-common/
+└── base/
+    ├── src/
+    │   ├── Exceptions/       # Custom exception types
+    │   │   ├── ValidationException.cs
+    │   │   ├── NotFoundException.cs
+    │   │   ├── UnauthorizedException.cs
+    │   │   └── BusinessLogicException.cs
+    │   ├── Middleware/       # ASP.NET middleware
+    │   │   ├── GlobalExceptionMiddleware.cs
+    │   │   └── RequestLoggingMiddleware.cs
+    │   ├── DTOs/             # Common DTOs
+    │   │   ├── ErrorResponse.cs
+    │   │   ├── ValidationErrorResponse.cs
+    │   │   └── ApiResponse.cs
+    │   ├── Components/       # Blazor components
+    │   │   └── ErrorBoundary.razor
+    │   └── Extensions/       # Extension methods
+    │       ├── ExceptionExtensions.cs
+    │       └── LoggingExtensions.cs
+    ├── Universo.Common.csproj
+    └── README.md / README-RU.md
+```
+
+**Key Classes**:
+```csharp
+// ErrorResponse.cs
+public class ErrorResponse
+{
+    public string Message { get; set; }
+    public string? Details { get; set; }
+    public string? TraceId { get; set; }
+    public DateTime Timestamp { get; set; }
+    public Dictionary<string, string[]>? ValidationErrors { get; set; }
+}
+
+// GlobalExceptionMiddleware.cs
+public class GlobalExceptionMiddleware
+{
+    // Catches all unhandled exceptions
+    // Logs with appropriate severity
+    // Returns structured ErrorResponse
+    // Maps exceptions to HTTP status codes
+}
+```
+
+**Acceptance Criteria**:
+- All unhandled exceptions caught and logged
+- Consistent error JSON structure across all endpoints
+- HTTP status codes correctly assigned (400, 401, 404, 500, etc.)
+- Sensitive information never exposed in production errors
+- Correlation IDs for request tracing
+- Blazor error boundaries prevent app crashes
+
+#### Validation Pipeline
+
+**Purpose**: Consistent input validation across all API endpoints
+
+**Components**:
+- FluentValidation integration
+- Validation middleware
+- Base validator classes
+- Automatic model state validation
+
+**Package**: `Universo.Common` (extends existing package)
+
+**Structure** (additions to Universo.Common):
+```
+packages/universo-common/base/src/
+├── Validators/           # Validation infrastructure
+│   ├── BaseValidator.cs
+│   ├── ValidationExtensions.cs
+│   └── Common validators (EmailValidator, etc.)
+├── Attributes/           # Custom validation attributes
+│   ├── NotEmptyGuidAttribute.cs
+│   └── ValidEnumAttribute.cs
+└── Filters/              # Action filters
+    └── ValidateModelStateFilter.cs
+```
+
+**Example Domain Validator**:
+```csharp
+// In Universo.Clusters.Srv package
+public class CreateClusterDtoValidator : AbstractValidator<CreateClusterDto>
+{
+    public CreateClusterDtoValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Cluster name is required")
+            .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
+            
+        RuleFor(x => x.Description)
+            .MaximumLength(1000)
+            .When(x => x.Description != null);
+    }
+}
+```
+
+**Acceptance Criteria**:
+- Validation executes before controller actions
+- Validation errors returned in standardized ErrorResponse format
+- 100% DTO coverage with validators in domain packages
+- Client-side and server-side validation consistent
+- Validation rules testable in isolation
+- Fluent API provides clear, readable rules
+
+#### Caching Infrastructure
+
+**Purpose**: Improve performance through strategic caching
+
+**Components**:
+- Memory cache configuration
+- Redis distributed cache setup
+- Cache service abstraction
+- Cache-aside pattern helpers
+
+**Package**: `Universo.Common` (extends existing package)
+
+**Structure** (additions to Universo.Common):
+```
+packages/universo-common/base/src/
+├── Caching/
+│   ├── ICacheService.cs          # Cache abstraction
+│   ├── CacheService.cs           # Implementation
+│   ├── CacheKeys.cs              # Key naming conventions
+│   ├── CacheOptions.cs           # Configuration options
+│   └── Extensions/
+│       └── CacheExtensions.cs    # Helper methods
+└── Configuration/
+    └── CacheConfiguration.cs     # Startup configuration
+```
+
+**Configuration**:
+```csharp
+// appsettings.json
+{
+  "Caching": {
+    "Redis": {
+      "Configuration": "localhost:6379",
+      "InstanceName": "Universo:"
+    },
+    "DefaultTTL": {
+      "ReferenceData": 3600,      // 1 hour
+      "UserData": 900,             // 15 minutes
+      "SessionData": 1800          // 30 minutes
+    }
+  }
+}
+
+// ICacheService.cs
+public interface ICacheService
+{
+    Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);
+    Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default);
+    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
+    Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default);
+}
+```
+
+**Acceptance Criteria**:
+- Both memory and distributed cache configured
+- Cache keys follow naming convention: `{package}:{entity}:{id}`
+- TTL appropriately configured per data type
+- Cache invalidation strategy documented
+- Performance tests show measurable caching benefit
+- Cache hit/miss metrics tracked
+
+#### Rate Limiting
+
+**Purpose**: Protect APIs from abuse and ensure fair usage
+
+**Components**:
+- IP-based rate limiting
+- User-based rate limiting
+- Configurable limit policies
+- Rate limit response headers
+
+**Package**: Uses AspNetCoreRateLimit NuGet package
+
+**Configuration**:
+```csharp
+// appsettings.json
+{
+  "IpRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "StackBlockedRequests": false,
+    "RealIpHeader": "X-Real-IP",
+    "HttpStatusCode": 429,
+    "GeneralRules": [
+      {
+        "Endpoint": "*:/api/*",
+        "Period": "15m",
+        "Limit": 100
+      },
+      {
+        "Endpoint": "*:/api/auth/*",
+        "Period": "1h",
+        "Limit": 20
+      }
+    ]
+  },
+  "ClientRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "GeneralRules": [
+      {
+        "Endpoint": "*",
+        "Period": "1h",
+        "Limit": 1000
+      }
+    ]
+  }
+}
+
+// Program.cs setup
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+app.UseIpRateLimiting();
+app.UseClientRateLimiting();
+```
+
+**Acceptance Criteria**:
+- Rate limits enforced on all public APIs
+- Appropriate HTTP 429 (Too Many Requests) responses
+- Rate limit headers included (X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset)
+- Different limits for anonymous vs authenticated users
+- Admin endpoints can be exempt from rate limiting
+- Rate limiting configuration testable
+
+**Deliverables for Section 1.3**:
+- Universo.Common package with error handling, validation, caching
+- Global exception middleware configured
+- FluentValidation integrated
+- Redis distributed cache configured
+- Rate limiting configured and tested
+- Structured logging with Serilog
+- Health check endpoints
+- Documentation for all infrastructure patterns
+
+**Total Time Estimate**: 2 weeks (overlaps with week 3-4)
+
+### 1.4 Authentication System (Week 4)
 
 #### Universo.Auth.Srv Package
 **Purpose**: Backend authentication service
