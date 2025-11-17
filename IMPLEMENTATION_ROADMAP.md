@@ -29,28 +29,40 @@ This roadmap outlines the phased implementation strategy for Universo Platformo 
 
 **Goal**: Establish project infrastructure and shared libraries
 
+**CRITICAL PRE-REQUISITE**: All work in Phase 1 and beyond MUST follow Constitution Principle I - Monorepo Package Architecture (NON-NEGOTIABLE). The `packages/` directory structure is MANDATORY before any feature implementation begins.
+
 ### 1.1 Project Setup (Week 1)
 
 **Tasks**:
 - [ ] Initialize .NET 8 solution structure
 - [ ] Configure Directory.Build.props for shared package versions
 - [ ] Set up EditorConfig for C# coding standards
-- [ ] Create packages/ directory structure
+- [ ] **⚠️ CRITICAL: Create `src/packages/` directory structure** (Constitution Principle I)
+- [ ] Create `src/shared/` directory (ONLY for infrastructure, NOT features)
 - [ ] Configure .gitignore for .NET projects
 - [ ] Set up GitHub labels from `.github/instructions/github-labels.md`
 - [ ] Create README.md and README-RU.md for root project
+- [ ] Add packages/ structure validation to code review checklist
 
 **Deliverables**:
 - Working .NET solution
 - Build system configured
+- **`src/packages/` directory exists and is ready for feature packages**
+- **`src/shared/` directory exists for infrastructure only**
 - Project documentation (EN/RU)
+- Package structure validation checklist
 
 **Acceptance Criteria**:
 - `dotnet build` succeeds for entire solution
 - All documentation is bilingual with identical structure
 - GitHub labels match the instruction file
+- **`src/packages/` directory exists and is documented**
+- **Validation checklist prevents feature code outside packages/**
+- README.md clearly explains packages/ vs shared/ distinction
 
 ### 1.2 Shared Infrastructure Packages (Weeks 2-3)
+
+**NOTE**: These packages go in `shared/` NOT `packages/` because they are cross-cutting infrastructure.
 
 #### Universo.Types Package
 **Purpose**: Shared DTOs, interfaces, and contracts
@@ -189,32 +201,31 @@ packages/universo-components/
 - Blazor error boundary components
 - Structured logging configuration
 
-**Package**: `Universo.Common` (new shared package)
+**Package**: `Universo.Common` (new shared infrastructure package)
 
 **Structure**:
 ```
-packages/universo-common/
-└── base/
-    ├── src/
-    │   ├── Exceptions/       # Custom exception types
-    │   │   ├── ValidationException.cs
-    │   │   ├── NotFoundException.cs
-    │   │   ├── UnauthorizedException.cs
-    │   │   └── BusinessLogicException.cs
-    │   ├── Middleware/       # ASP.NET middleware
-    │   │   ├── GlobalExceptionMiddleware.cs
-    │   │   └── RequestLoggingMiddleware.cs
-    │   ├── DTOs/             # Common DTOs
-    │   │   ├── ErrorResponse.cs
-    │   │   ├── ValidationErrorResponse.cs
-    │   │   └── ApiResponse.cs
-    │   ├── Components/       # Blazor components
-    │   │   └── ErrorBoundary.razor
-    │   └── Extensions/       # Extension methods
-    │       ├── ExceptionExtensions.cs
-    │       └── LoggingExtensions.cs
-    ├── Universo.Common.csproj
-    └── README.md / README-RU.md
+shared/Universo.Common/          # ⚠️ NOTE: In shared/ not packages/ (infrastructure)
+├── src/
+│   ├── Exceptions/              # Custom exception types
+│   │   ├── ValidationException.cs
+│   │   ├── NotFoundException.cs
+│   │   ├── UnauthorizedException.cs
+│   │   └── BusinessLogicException.cs
+│   ├── Middleware/              # ASP.NET middleware
+│   │   ├── GlobalExceptionMiddleware.cs
+│   │   └── RequestLoggingMiddleware.cs
+│   ├── DTOs/                    # Common DTOs
+│   │   ├── ErrorResponse.cs
+│   │   ├── ValidationErrorResponse.cs
+│   │   └── ApiResponse.cs
+│   ├── Components/              # Blazor components
+│   │   └── ErrorBoundary.razor
+│   └── Extensions/              # Extension methods
+│       ├── ExceptionExtensions.cs
+│       └── LoggingExtensions.cs
+├── Universo.Common.csproj
+└── README.md / README-RU.md
 ```
 
 **Key Classes**:
@@ -309,11 +320,11 @@ public class CreateClusterDtoValidator : AbstractValidator<CreateClusterDto>
 - Cache service abstraction
 - Cache-aside pattern helpers
 
-**Package**: `Universo.Common` (extends existing package)
+**Package**: `Universo.Common` (extends existing shared infrastructure package)
 
-**Structure** (additions to Universo.Common):
+**Structure** (additions to Universo.Common in shared/):
 ```
-packages/universo-common/base/src/
+shared/Universo.Common/src/     # ⚠️ NOTE: In shared/ not packages/
 ├── Caching/
 │   ├── ICacheService.cs          # Cache abstraction
 │   ├── CacheService.cs           # Implementation
