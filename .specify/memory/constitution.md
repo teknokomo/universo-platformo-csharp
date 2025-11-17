@@ -105,8 +105,11 @@ All development MUST follow GitHub workflow standards:
 - Labels MUST be applied according to `.github/instructions/github-labels.md`
 - Bilingual content in Issues/PRs MUST use exact spoiler format: `<summary>In Russian</summary>`
 - PR titles MUST start with issue number: `GH{issue_number} {title}`
+- Russian translation MUST be complete, not just a summary
+- Russian and English versions MUST have identical structure and line count
+- Update both language versions simultaneously
 
-**Rationale**: Standardized GitHub workflows ensure traceability, proper documentation, and consistency across the project. These standards align with the reference React implementation and support effective collaboration.
+**Rationale**: Standardized GitHub workflows ensure traceability, proper documentation, and consistency across the project. These standards align with the reference React implementation and support effective collaboration. Complete bilingual documentation ensures accessibility for both English and Russian-speaking communities.
 
 ### VII. Multi-Database Preparedness
 
@@ -116,8 +119,49 @@ Architecture MUST support multiple database systems:
 - Data models MUST be database-agnostic where possible
 - Connection management MUST support configuration-based switching
 - Migration strategy MUST be planned for adding PostgreSQL, SQL Server, etc.
+- Use Entity Framework Core with Npgsql provider for PostgreSQL
+- Each domain package SHOULD have its own DbContext or share a common context
+- Implement Code-First migrations per domain package
+- DbContext MUST use scoped lifetime in ASP.NET Core
 
-**Rationale**: While Supabase provides rapid initial development, the platform must support enterprise deployments with various DBMS requirements. Early architectural decisions prevent costly refactoring later.
+**Rationale**: While Supabase provides rapid initial development, the platform must support enterprise deployments with various DBMS requirements. Early architectural decisions prevent costly refactoring later. Entity Framework Core provides the abstraction layer needed for multi-database support.
+
+### VIII. Three-Entity Domain Pattern
+
+Domain models SHOULD follow the three-entity hierarchical pattern where applicable:
+- **Top-level container entity** (e.g., Cluster, Metaverse, Unik/Workspace)
+- **Mid-level grouping entity** (e.g., Domain, Section, Space/Canvas)
+- **Bottom-level item entity** (e.g., Resource, Entity, Node/Component)
+- Create generic base classes for CRUD operations
+- Maintain consistent API design across domains
+- Reuse UI components with different entity names
+- Apply pattern only where hierarchical organization is natural
+
+**Rationale**: The React reference implementation demonstrates that consistency across domains reduces cognitive load, enables significant code reuse, and accelerates development of new domain areas. This pattern has been successfully applied to Clusters, Metaverses, and Uniks domains in the React version.
+
+### IX. Template System Architecture
+
+Template packages MUST follow a consistent structure:
+- Self-contained implementations with all dependencies
+- Support for UPDL node integration
+- Technology-specific builders implementing common interfaces
+- Export capabilities for target platforms (AR.js, PlayCanvas, Unity, etc.)
+- Integration with publication system
+- Independent versioning and deployment
+
+**Rationale**: The React project's template system (template-quiz, template-mmoomm) demonstrates the value of modular, technology-specific implementations that can be dynamically loaded based on user needs. Templates enable platform extensibility without modifying core code.
+
+### X. Async Initialization Pattern
+
+Backend services MUST implement asynchronous initialization:
+- Database connections MUST be established before route registration
+- Use IHostedService for startup tasks (database migrations, cache warming)
+- Implement health checks to verify system readiness
+- Prevent race conditions during startup
+- Handle initialization failures gracefully with proper error messages
+- Log initialization progress for debugging
+
+**Rationale**: The React reference implementation's async route initialization pattern prevents common startup issues, ensures system stability during deployment and scaling, and provides clear diagnostics when initialization fails. This is critical for enterprise deployments.
 
 ## Technology Stack Standards
 
@@ -233,4 +277,4 @@ Before merging any PR, verify:
 - Community feedback incorporated through Issues
 - All changes tracked with version history and Sync Impact Report
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
+**Version**: 1.1.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-17
