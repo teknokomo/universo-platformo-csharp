@@ -1543,6 +1543,812 @@ Numbers automatically format according to current culture:
 Рабочий процесс перевода включает написание строк на английском, извлечение недостающих переводов, заполнение русских файлов ресурсов, проверку и тестирование переключения языков.
 </details>
 
+## C# Technology Stack Best Practices / Лучшие практики технологического стека C#
+
+This section documents C#-specific best practices for implementing backend and frontend packages and their interaction patterns. These practices are based on industry standards and complement the React project patterns documented in `REACT_PROJECT_ANALYSIS.md`.
+
+<details>
+<summary>In Russian</summary>
+
+Этот раздел документирует лучшие практики, специфичные для C#, для реализации пакетов бэкенда и фронтенда и паттернов их взаимодействия. Эти практики основаны на отраслевых стандартах и дополняют паттерны проекта React, задокументированные в `REACT_PROJECT_ANALYSIS.md`.
+</details>
+
+### API Communication Patterns / Паттерны взаимодействия с API
+
+#### Typed HttpClient Services / Типизированные сервисы HttpClient
+
+**CRITICAL**: Always use dependency injection for HttpClient. Never manually instantiate HttpClient instances to avoid socket exhaustion.
+
+**Frontend Pattern** (in `packages/*-frt/base/`):
+
+```csharp
+// 1. Define service interface
+public interface IClusterApiService
+{
+    Task<List<ClusterDto>> GetClustersAsync();
+    Task<ClusterDto?> GetClusterAsync(Guid id);
+    Task<ClusterDto> CreateClusterAsync(CreateClusterRequest request);
+    Task UpdateClusterAsync(Guid id, UpdateClusterRequest request);
+    Task DeleteClusterAsync(Guid id);
+}
+
+// 2. Implement typed client service
+public class ClusterApiService : IClusterApiService
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<ClusterApiService> _logger;
+    
+    public ClusterApiService(HttpClient httpClient, ILogger<ClusterApiService> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+    
+    public async Task<List<ClusterDto>> GetClustersAsync()
+    {
+        try
+        {
+            var clusters = await _httpClient.GetFromJsonAsync<List<ClusterDto>>("api/clusters");
+            return clusters ?? new List<ClusterDto>();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Failed to fetch clusters");
+            throw;
+        }
+    }
+    
+    public async Task<ClusterDto> CreateClusterAsync(CreateClusterRequest request)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/clusters", request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ClusterDto>()
+            ?? throw new InvalidOperationException("Failed to deserialize response");
+    }
+}
+
+// 3. Register in Program.cs (Blazor WASM)
+builder.Services.AddHttpClient<IClusterApiService, ClusterApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] ?? builder.HostEnvironment.BaseAddress);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// 4. Inject service into components
+@inject IClusterApiService ClusterApi
+
+@code {
+    private List<ClusterDto> clusters = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        clusters = await ClusterApi.GetClustersAsync();
+    }
+}
+```
+
+**Backend Pattern** (in `packages/*-srv/base/`):
+
+```csharp
+// Controllers use service layer, not direct repository access
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class ClustersController : ControllerBase
+{
+    private readonly IClusterService _clusterService;
+    private readonly ILogger<ClustersController> _logger;
+    
+    public ClustersController(
+        IClusterService clusterService,
+        ILogger<ClustersController> logger)
+    {
+        _clusterService = clusterService;
+        _logger = logger;
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<ClusterDto>>> GetClusters()
+    {
+        var clusters = await _clusterService.GetClustersAsync();
+        return Ok(clusters);
+    }
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ClusterDto>> GetCluster(Guid id)
+    {
+        var cluster = await _clusterService.GetClusterAsync(id);
+        return cluster != null ? Ok(cluster) : NotFound();
+    }
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+**КРИТИЧНО**: Всегда используйте внедрение зависимостей для HttpClient. Никогда не создавайте экземпляры HttpClient вручную, чтобы избежать исчерпания сокетов.
+
+Типизированные клиентские сервисы инкапсулируют логику взаимодействия с API в выделенных сервисах, что улучшает тестируемость, разделение ответственности и поддерживаемость.
+</details>
+
+#### Shared Contract Libraries / Библиотеки общих контрактов
+
+Create shared package for DTOs used by both frontend and backend:
+
+```
+src/shared/Universo.Contracts/
+├── Clusters/
+│   ├── ClusterDto.cs
+│   ├── CreateClusterRequest.cs
+│   └── UpdateClusterRequest.cs
+├── Metaverses/
+│   ├── MetaverseDto.cs
+│   └── ...
+└── Common/
+    ├── PagedResult.cs
+    └── ErrorResponse.cs
+```
+
+```csharp
+// Example DTO
+public record ClusterDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Description { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public DateTime UpdatedAt { get; init; }
+    public int DomainsCount { get; init; }
+    public int ResourcesCount { get; init; }
+}
+
+// Request DTOs with validation attributes
+public record CreateClusterRequest
+{
+    [Required]
+    [StringLength(100, MinimumLength = 3)]
+    public string Name { get; init; } = string.Empty;
+    
+    [StringLength(500)]
+    public string? Description { get; init; }
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+Создайте общий пакет для DTO, используемых как фронтендом, так и бэкендом. Это обеспечивает типобезопасность, устраняет дублирование кода и предотвращает ошибки сериализации.
+</details>
+
+### Error Handling Implementation / Реализация обработки ошибок
+
+#### Global Exception Middleware / Глобальное middleware для обработки исключений
+
+**Backend Implementation** (Constitution Principle XI):
+
+```csharp
+// 1. Define custom exception middleware
+public class GlobalExceptionHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
+    
+    public GlobalExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<GlobalExceptionHandlingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+    
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+    
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        _logger.LogError(exception, "Unhandled exception occurred");
+        
+        var (statusCode, title, detail) = exception switch
+        {
+            NotFoundException => (StatusCodes.Status404NotFound, "Not Found", exception.Message),
+            ValidationException => (StatusCodes.Status400BadRequest, "Validation Error", exception.Message),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized", "Access denied"),
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error", 
+                  "An unexpected error occurred")
+        };
+        
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail,
+            Instance = context.Request.Path
+        };
+        
+        // Don't expose internal details in production
+        if (context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsProduction())
+        {
+            problemDetails.Detail = statusCode == StatusCodes.Status500InternalServerError
+                ? "An error occurred while processing your request"
+                : detail;
+        }
+        
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/problem+json";
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    }
+}
+
+// 2. Custom exception types
+public class NotFoundException : Exception
+{
+    public NotFoundException(string message) : base(message) { }
+    public NotFoundException(string entityName, object key) 
+        : base($"{entityName} with id {key} was not found") { }
+}
+
+public class ValidationException : Exception
+{
+    public ValidationException(string message) : base(message) { }
+    public ValidationException(Dictionary<string, string[]> errors) 
+        : base("One or more validation errors occurred")
+    {
+        Errors = errors;
+    }
+    
+    public Dictionary<string, string[]>? Errors { get; }
+}
+
+// 3. Register middleware in Program.cs (early in pipeline)
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+```
+
+**Frontend Error Handling**:
+
+```csharp
+// Blazor error boundary in layout
+<ErrorBoundary>
+    <ChildContent>
+        @Body
+    </ChildContent>
+    <ErrorContent Context="exception">
+        <MudAlert Severity="Severity.Error">
+            <MudText>An error occurred:</MudText>
+            <MudText Typo="Typo.caption">@exception.Message</MudText>
+        </MudAlert>
+    </ErrorContent>
+</ErrorBoundary>
+
+// Service-level error handling
+public class ClusterApiService : IClusterApiService
+{
+    private readonly HttpClient _httpClient;
+    private readonly ISnackbar _snackbar;
+    
+    public async Task<ClusterDto> CreateClusterAsync(CreateClusterRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/clusters", request);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var problemDetails = await response.Content
+                    .ReadFromJsonAsync<ProblemDetails>();
+                _snackbar.Add(problemDetails?.Detail ?? "Failed to create cluster", 
+                    Severity.Error);
+                throw new HttpRequestException(problemDetails?.Detail);
+            }
+            
+            return await response.Content.ReadFromJsonAsync<ClusterDto>()
+                ?? throw new InvalidOperationException();
+        }
+        catch (HttpRequestException ex)
+        {
+            _snackbar.Add($"Network error: {ex.Message}", Severity.Error);
+            throw;
+        }
+    }
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+Глобальное middleware для обработки исключений обеспечивает централизованную обработку ошибок. Используйте стандарт ProblemDetails (RFC 7807) для структурированных ответов об ошибках. Не раскрывайте внутренние детали в продакшене.
+</details>
+
+### Validation Strategy Implementation / Реализация стратегии валидации
+
+#### FluentValidation Pattern / Паттерн FluentValidation
+
+**Backend Implementation** (Constitution Principle XII):
+
+```csharp
+// 1. Define validator classes
+public class CreateClusterRequestValidator : AbstractValidator<CreateClusterRequest>
+{
+    public CreateClusterRequestValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Cluster name is required")
+            .Length(3, 100).WithMessage("Name must be between 3 and 100 characters")
+            .Matches(@"^[a-zA-Z0-9-_ ]+$").WithMessage("Name contains invalid characters");
+        
+        RuleFor(x => x.Description)
+            .MaximumLength(500).WithMessage("Description cannot exceed 500 characters");
+    }
+}
+
+// 2. Register validators in Program.cs
+builder.Services.AddValidatorsFromAssemblyContaining<CreateClusterRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
+// 3. Use in service layer (not controllers)
+public class ClusterService : IClusterService
+{
+    private readonly IValidator<CreateClusterRequest> _validator;
+    
+    public async Task<ClusterDto> CreateClusterAsync(CreateClusterRequest request)
+    {
+        var validationResult = await _validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray());
+            
+            throw new ValidationException(errors);
+        }
+        
+        // Proceed with creation
+    }
+}
+
+// 4. Automatic model validation filter (alternative)
+public class ValidateModelStateAttribute : ActionFilterAttribute
+{
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        if (!context.ModelState.IsValid)
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+            
+            var problemDetails = new ValidationProblemDetails(errors)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "One or more validation errors occurred"
+            };
+            
+            context.Result = new BadRequestObjectResult(problemDetails);
+        }
+    }
+}
+```
+
+**Frontend Validation**:
+
+```csharp
+// Blazor form validation with MudBlazor
+<MudForm @ref="form" @bind-IsValid="@isValid">
+    <MudTextField @bind-Value="model.Name" 
+                  For="@(() => model.Name)"
+                  Label="Cluster Name"
+                  Required="true"
+                  RequiredError="Name is required"
+                  MaxLength="100" />
+    
+    <MudTextField @bind-Value="model.Description"
+                  For="@(() => model.Description)"
+                  Label="Description"
+                  Lines="3"
+                  MaxLength="500" />
+    
+    <MudButton Disabled="@(!isValid)" 
+               OnClick="Submit" 
+               Variant="Variant.Filled" 
+               Color="Color.Primary">
+        Create Cluster
+    </MudButton>
+</MudForm>
+
+@code {
+    private MudForm form = null!;
+    private bool isValid;
+    private CreateClusterRequest model = new();
+    
+    private async Task Submit()
+    {
+        await form.Validate();
+        if (isValid)
+        {
+            await ClusterApi.CreateClusterAsync(model);
+        }
+    }
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+FluentValidation обеспечивает мощную, переиспользуемую валидацию. Валидируйте на сервисном слое, а не в контроллерах. Используйте ту же логику валидации на фронтенде для лучшего UX.
+</details>
+
+### Dependency Injection Best Practices / Лучшие практики внедрения зависимостей
+
+#### Service Lifetime Guidelines / Руководство по времени жизни сервисов
+
+```csharp
+// Program.cs - Backend package configuration
+
+// TRANSIENT: New instance for each request
+// Use for: Lightweight, stateless services
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<ITemplateProcessor, TemplateProcessor>();
+
+// SCOPED: One instance per request/connection
+// Use for: DbContext, repositories, request-bound services
+builder.Services.AddScoped<IClusterRepository, ClusterRepository>();
+builder.Services.AddScoped<IClusterService, ClusterService>();
+builder.Services.AddDbContext<UniversoDbContext>(ServiceLifetime.Scoped);
+
+// SINGLETON: One instance for application lifetime
+// Use for: Configuration, caching, thread-safe services
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+builder.Services.AddSingleton<ITemplateRegistry, TemplateRegistry>();
+
+// HttpClient registration (managed lifetime)
+builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalApi:Url"]!);
+    client.Timeout = TimeSpan.FromSeconds(30);
+})
+.AddPolicyHandler(GetRetryPolicy())
+.AddPolicyHandler(GetCircuitBreakerPolicy());
+
+// Polly resilience policies
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => 
+            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+}
+
+static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+}
+```
+
+**Blazor WASM DI** (Frontend packages):
+
+```csharp
+// Program.cs - Frontend package configuration
+
+// SCOPED in Blazor WASM = Singleton per browser session
+builder.Services.AddScoped<IClusterApiService, ClusterApiService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+// State management
+builder.Services.AddFluxor(options =>
+{
+    options.ScanAssemblies(typeof(Program).Assembly);
+    options.UseReduxDevTools();
+});
+
+// Localization
+builder.Services.AddLocalization();
+
+// MudBlazor
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+    config.SnackbarConfiguration.PreventDuplicates = false;
+});
+```
+
+<details>
+<summary>In Russian</summary>
+
+Правильный выбор времени жизни сервисов критичен для производительности и корректности. Transient для легковесных сервисов, Scoped для DbContext и репозиториев, Singleton для конфигурации и кеширования.
+</details>
+
+### Performance Optimization / Оптимизация производительности
+
+#### Blazor WebAssembly AOT Compilation / AOT-компиляция Blazor WebAssembly
+
+```xml
+<!-- Frontend package .csproj -->
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <!-- Enable AOT for production builds -->
+    <RunAOTCompilation>true</RunAOTCompilation>
+    
+    <!-- Enable trimming to reduce size -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+  </PropertyGroup>
+</Project>
+```
+
+#### Lazy Loading and Code Splitting / Ленивая загрузка и разделение кода
+
+```csharp
+// App.razor - Lazy load routes
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="@lazyLoadedAssemblies">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p>Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    private List<Assembly> lazyLoadedAssemblies = new();
+    
+    protected override async Task OnNavigatedAsync(NavigationContext args)
+    {
+        if (args.Path.StartsWith("clusters"))
+        {
+            var assemblies = await LazyLoader.LoadAssembliesAsync(
+                new[] { "Universo.Clusters.Frt.dll" });
+            lazyLoadedAssemblies.AddRange(assemblies);
+        }
+    }
+}
+```
+
+#### API Response Caching / Кеширование ответов API
+
+```csharp
+// Backend caching middleware
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Response caching
+        services.AddResponseCaching();
+        
+        // Distributed cache (Redis)
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Configuration.GetConnectionString("Redis");
+            options.InstanceName = "UniversoPlatformo_";
+        });
+        
+        // Memory cache
+        services.AddMemoryCache();
+    }
+    
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseResponseCaching();
+    }
+}
+
+// Controller with caching
+[HttpGet]
+[ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "pageSize" })]
+public async Task<ActionResult<PagedResult<ClusterDto>>> GetClusters(
+    int page = 1, int pageSize = 10)
+{
+    var clusters = await _clusterService.GetClustersAsync(page, pageSize);
+    return Ok(clusters);
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+Включите AOT-компиляцию для значительного улучшения производительности Blazor WASM. Используйте ленивую загрузку для больших приложений. Кешируйте ответы API для часто запрашиваемых данных.
+</details>
+
+### API Versioning Strategy / Стратегия версионирования API
+
+```csharp
+// Install: Asp.Versioning.Http
+
+// Program.cs
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
+
+// Controller versioning
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
+public class ClustersV1Controller : ControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult<List<ClusterDto>>> GetClusters()
+    {
+        // V1 implementation
+    }
+}
+
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("2.0")]
+public class ClustersV2Controller : ControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<ClusterDto>>> GetClusters(
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        // V2 implementation with pagination
+    }
+}
+
+// Frontend version-aware client
+public class ClusterApiService : IClusterApiService
+{
+    private const string ApiVersion = "2.0";
+    
+    public async Task<PagedResult<ClusterDto>> GetClustersAsync(int page, int pageSize)
+    {
+        return await _httpClient
+            .GetFromJsonAsync<PagedResult<ClusterDto>>($"api/v{ApiVersion}/clusters?page={page}&pageSize={pageSize}");
+    }
+}
+```
+
+<details>
+<summary>In Russian</summary>
+
+Используйте версионирование API с самого начала для обеспечения обратной совместимости. URL-версионирование (v1, v2) является наиболее явным и прозрачным подходом.
+</details>
+
+### Security Best Practices / Лучшие практики безопасности
+
+#### Rate Limiting Configuration / Конфигурация ограничения скорости
+
+**Backend Implementation** (Constitution Principle XIV):
+
+```csharp
+// .NET 7+ built-in rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+    // Fixed window limiter for anonymous endpoints
+    options.AddFixedWindowLimiter("anonymous", opt =>
+    {
+        opt.PermitLimit = 100;
+        opt.Window = TimeSpan.FromMinutes(15);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 10;
+    });
+    
+    // Token bucket limiter for authenticated endpoints
+    options.AddTokenBucketLimiter("authenticated", opt =>
+    {
+        opt.TokenLimit = 1000;
+        opt.ReplenishmentPeriod = TimeSpan.FromHours(1);
+        opt.TokensPerPeriod = 1000;
+        opt.AutoReplenishment = true;
+    });
+    
+    // Concurrency limiter for resource-intensive operations
+    options.AddConcurrencyLimiter("publish", opt =>
+    {
+        opt.PermitLimit = 10;
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 5;
+    });
+    
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            await context.HttpContext.Response.WriteAsync(
+                $"Too many requests. Please try again after {retryAfter.TotalSeconds} seconds.", 
+                token);
+        }
+        else
+        {
+            await context.HttpContext.Response.WriteAsync(
+                "Too many requests. Please try again later.", token);
+        }
+    };
+});
+
+// Apply in middleware pipeline
+app.UseRateLimiter();
+
+// Apply to controllers
+[EnableRateLimiting("authenticated")]
+[ApiController]
+[Route("api/[controller]")]
+public class ClustersController : ControllerBase
+{
+    [HttpPost]
+    [EnableRateLimiting("publish")] // Override for specific action
+    public async Task<ActionResult> PublishCluster(PublishClusterRequest request)
+    {
+        // Resource-intensive operation
+    }
+}
+```
+
+#### CORS Configuration / Конфигурация CORS
+
+```csharp
+// Program.cs - Backend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorWASM", policy =>
+    {
+        policy.WithOrigins(
+                builder.Configuration["AllowedOrigins"]!.Split(';'))
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+app.UseCors("AllowBlazorWASM");
+```
+
+#### Security Headers / Заголовки безопасности
+
+```csharp
+// Install: NWebsec.AspNetCore.Middleware
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("Content-Security-Policy", 
+        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
+    
+    await next();
+});
+```
+
+<details>
+<summary>In Russian</summary>
+
+Реализуйте ограничение скорости для защиты от злоупотреблений и DoS-атак. Настройте CORS правильно для безопасного взаимодействия между фронтендом и бэкендом. Добавьте заголовки безопасности для защиты от распространенных уязвимостей.
+</details>
+
 ## References / Ссылки
 
 - [.NET Documentation](https://docs.microsoft.com/dotnet/)
@@ -1551,3 +2357,6 @@ Numbers automatically format according to current culture:
 - [MudBlazor Documentation](https://mudblazor.com/)
 - [Entity Framework Core Documentation](https://docs.microsoft.com/ef/core/)
 - [Supabase C# Client](https://supabase.com/docs/reference/csharp/introduction)
+- [FluentValidation Documentation](https://docs.fluentvalidation.net/)
+- [ASP.NET Core Rate Limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit)
+- [Blazor Performance Best Practices](https://learn.microsoft.com/en-us/aspnet/core/blazor/performance)
