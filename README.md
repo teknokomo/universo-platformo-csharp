@@ -56,6 +56,20 @@ Universo Platformo C# is a project that provides:
 
 The project aims to create a unified platform for developing interactive 3D applications that can be exported to various technologies including AR.js, PlayCanvas, Babylon.js, Three.js, and A-Frame.
 
+## ⚠️ Architecture Warning: Mandatory Modular Structure
+
+**CRITICAL**: This project follows a **NON-NEGOTIABLE** modular package architecture:
+
+-   ✅ **ALL feature functionality MUST be in `src/packages/` directory**
+-   ✅ Each feature MUST be split into `-frt` (frontend) and `-srv` (backend) packages
+-   ✅ Each package MUST have a `base/` subdirectory for the primary implementation
+-   ❌ **PROHIBITED**: Feature functionality outside `src/packages/` directory
+-   ❌ **PROHIBITED**: Monolithic implementations mixing frontend and backend
+
+**Rationale**: Packages will gradually migrate to separate repositories as the project matures. This architecture is NOT optional - it's fundamental to the project's long-term evolution.
+
+See [Constitution Principle I](.specify/memory/constitution.md) for complete details.
+
 ## Current Status
 
 **Current Version**: 0.1.0-alpha (November 2025)
@@ -80,10 +94,12 @@ The project aims to create a unified platform for developing interactive 3D appl
 
 ## Project Structure
 
+**⚠️ MANDATORY ARCHITECTURE**: All features MUST be in `src/packages/`. See [Architecture Warning](#️-architecture-warning-mandatory-modular-structure) above.
+
 ```
 universo-platformo-csharp/
 ├── src/
-│   ├── packages/                  # Package-based architecture
+│   ├── packages/                  # ⚠️ ALL feature packages MUST go here
 │   │   ├── analytics-frt/         # Analytics frontend
 │   │   │   └── base/              # Base implementation
 │   │   ├── analytics-srv/         # Analytics backend
@@ -112,15 +128,21 @@ universo-platformo-csharp/
 │   │   │   └── base/              # Base implementation
 │   │   └── publish/               # Publication system
 │   │       └── base/              # Base implementation
-│   ├── shared/                    # Shared libraries
+│   ├── shared/                    # ⚠️ ONLY for infrastructure libraries
 │   │   ├── Universo.Types/        # Shared types
 │   │   ├── Universo.Utils/        # Utility functions
-│   │   └── Universo.I18n/         # Internationalization
+│   │   ├── Universo.I18n/         # Internationalization
+│   │   └── Universo.Common/       # Error handling, validation, caching
 │   └── Universo.sln               # Main solution file
 ├── tests/                         # Test projects
 ├── docs/                          # Documentation (will be moved to separate repo)
 └── tools/                         # Build and development tools
 ```
+
+**What goes where:**
+- **`packages/`** - ALL domain features (Authentication, Clusters, Metaverses, Templates, etc.)
+- **`shared/`** - ONLY cross-cutting infrastructure (Types, Utils, I18n, Common infrastructure)
+- **Root** - Solution files, documentation, configuration
 
 This structure allows for:
 
@@ -129,6 +151,7 @@ This structure allows for:
 -   **Easy Extension**: New packages can be added following the established pattern
 -   **Clean Separation**: Clear boundaries between frontend and backend code
 -   **Base Implementations**: Each package has a `base/` folder for future alternative implementations
+-   **Repository Migration**: Packages can be moved to separate repos without refactoring
 
 ## Monorepo Management
 

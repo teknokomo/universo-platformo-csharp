@@ -33,9 +33,9 @@ Set up the foundational structure for Universo Platformo CSharp using Blazor Web
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Verify compliance with `.specify/memory/constitution.md`:
+Verify compliance with `.specify/memory/constitution.md` (Version 1.3.0):
 
-- [x] **Monorepo Package Architecture**: ✅ Feature organized in `packages/` with proper naming (`-frt`, `-srv`, `-common`) and `base/` structure
+- [x] **Monorepo Package Architecture (NON-NEGOTIABLE)**: ✅ Feature organized in `packages/` with proper naming (`-frt`, `-srv`, `-common`) and `base/` structure. CRITICAL: No feature functionality outside packages/
 - [x] **Frontend/Backend Separation**: ✅ Clear separation into `-frt` (Blazor WASM) and `-srv` (ASP.NET Core) packages
 - [x] **Base Implementation Pattern**: ✅ Using `base/` directory for primary Supabase implementation
 - [x] **Bilingual Documentation**: ✅ English + Russian versions planned (README.md + README-RU.md with identical structure)
@@ -51,6 +51,12 @@ Verify compliance with `.specify/memory/constitution.md`:
 - [x] **Template System Architecture**: ✅ Extensible package-based template system planned
 
 **Status**: ✅ All constitution principles satisfied. No violations to justify.
+
+**CRITICAL VALIDATION**: 
+- ✅ `src/packages/` directory MUST be created in Phase 1 before any feature work
+- ✅ All domain features (Clusters, Metaverses, Auth, etc.) MUST go in packages/
+- ✅ Only infrastructure libraries (Types, Utils, I18n) allowed in src/shared/
+- ✅ No feature functionality outside packages/ directory
 
 ## Project Structure
 
@@ -77,6 +83,8 @@ specs/[###-feature]/
 ```text
 # Universo Platformo CSharp - Monorepo Structure
 
+⚠️ CRITICAL: ALL feature functionality MUST be in src/packages/ (Constitution Principle I - NON-NEGOTIABLE)
+
 /
 ├── .github/
 │   ├── workflows/           # CI/CD pipelines
@@ -86,47 +94,47 @@ specs/[###-feature]/
 │   ├── scripts/             # Workflow scripts
 │   └── templates/           # Document templates
 ├── src/
-│   └── packages/            # All feature packages
-│       ├── core-srv/        # Core backend infrastructure
-│       │   └── base/
-│       │       ├── Middleware/
-│       │       ├── Exceptions/
-│       │       ├── Extensions/
-│       │       └── Tests/
-│       ├── core-frt/        # Core frontend infrastructure
-│       │   └── base/
-│       │       ├── Components/
-│       │       ├── Services/
-│       │       ├── Models/
-│       │       └── Tests/
-│       ├── auth-srv/        # Authentication backend
-│       │   └── base/
-│       │       ├── Controllers/
-│       │       ├── Services/
-│       │       ├── Repositories/
-│       │       ├── Validators/
-│       │       └── Tests/
-│       ├── auth-frt/        # Authentication frontend
-│       │   └── base/
-│       │       ├── Components/
-│       │       ├── Pages/
-│       │       └── Tests/
-│       └── [feature]-srv/   # Feature backend packages
-│           └── base/
-│               ├── Controllers/     # API endpoints
-│               ├── Services/        # Business logic
-│               ├── Models/          # Data models
-│               ├── Repositories/    # Data access (Repository Pattern)
-│               ├── Validators/      # FluentValidation validators
-│               ├── Exceptions/      # Custom exceptions
-│               └── Tests/           # xUnit + Testcontainers
-├── shared/
-│   └── Common/              # Shared utilities, DTOs, contracts
+│   ├── packages/            # ⚠️ MANDATORY: ALL feature packages go here
+│   │   ├── auth-srv/        # Authentication backend
+│   │   │   └── base/
+│   │   │       ├── Controllers/
+│   │   │       ├── Services/
+│   │   │       ├── Repositories/
+│   │   │       ├── Validators/
+│   │   │       ├── Exceptions/
+│   │   │       └── Tests/
+│   │   ├── auth-frt/        # Authentication frontend
+│   │   │   └── base/
+│   │   │       ├── Components/
+│   │   │       ├── Pages/
+│   │   │       └── Tests/
+│   │   ├── clusters-srv/    # Clusters backend (Three-Entity Pattern)
+│   │   │   └── base/
+│   │   ├── clusters-frt/    # Clusters frontend
+│   │   │   └── base/
+│   │   ├── metaverses-srv/  # Metaverses backend
+│   │   │   └── base/
+│   │   ├── metaverses-frt/  # Metaverses frontend
+│   │   │   └── base/
+│   │   └── [feature]-srv/   # Additional feature packages
+│   │       └── base/
+│   │           ├── Controllers/     # API endpoints
+│   │           ├── Services/        # Business logic
+│   │           ├── Models/          # Data models
+│   │           ├── Repositories/    # Data access (Repository Pattern)
+│   │           ├── Validators/      # FluentValidation validators
+│   │           ├── Exceptions/      # Custom exceptions
+│   │           └── Tests/           # xUnit + Testcontainers
+│   ├── shared/              # ⚠️ ONLY for cross-cutting infrastructure
+│   │   ├── Universo.Types/  # Common types and interfaces
+│   │   ├── Universo.Utils/  # Utility functions
+│   │   ├── Universo.I18n/   # Internationalization
+│   │   └── Universo.Common/ # Error handling, validation, caching
+│   ├── Universo.sln         # Single solution file
+│   ├── Directory.Build.props    # Shared build configuration
+│   └── Directory.Packages.props # Centralized package versions
 ├── specs/                   # Feature specifications
 ├── tests/                   # Integration tests
-├── docs/                    # Future: separate repository
-├── UniversoPlatformo.sln    # Single solution file
-├── Directory.Build.props    # Shared build configuration
 ├── .editorconfig            # Code style rules
 ├── .gitignore
 ├── README.md
@@ -135,6 +143,7 @@ specs/[###-feature]/
 ```
 
 **Structure Decision**: 
+- **⚠️ NON-NEGOTIABLE**: ALL features MUST be in `src/packages/` (NOT in shared/)
 - **Monorepo**: Single .NET solution (.sln) with Directory.Build.props for shared configuration
 - **Clean Architecture**: Domain → Application → Infrastructure → Presentation layers
 - **Package Organization**: Features split into `-frt` (Blazor), `-srv` (ASP.NET), `-common` (shared contracts)

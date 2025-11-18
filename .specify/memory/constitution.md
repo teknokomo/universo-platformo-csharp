@@ -1,7 +1,31 @@
 <!--
 SYNC IMPACT REPORT - Constitution Update
-Version: 0.1.0 → 1.0.0 → 1.1.0 → 1.2.0 (Deep Architectural Comparison)
-Date: 2025-11-16 (v1.0.0), 2025-11-16 (v1.1.0), 2025-11-17 (v1.2.0)
+Version: 0.1.0 → 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 (Modular Architecture Enforcement)
+Date: 2025-11-16 (v1.0.0), 2025-11-16 (v1.1.0), 2025-11-17 (v1.2.0), 2025-11-17 (v1.3.0)
+
+Changes in v1.3.0:
+- STRENGTHENED Principle I (Monorepo Package Architecture) to NON-NEGOTIABLE status
+- Added explicit PROHIBITED and MANDATORY constraints for packages/ directory
+- Clarified what is permitted outside packages/ directory
+- Added EXCEPTION clause for shared/ infrastructure libraries
+- Enhanced rationale explaining future repository separation requirement
+- This change addresses critical need to prevent non-modular implementations
+
+Enhanced Principle in v1.3.0:
+1. Monorepo Package Architecture - NOW MARKED AS NON-NEGOTIABLE with explicit constraints
+
+Impact on Implementation:
+- ALL feature implementations MUST verify packages/ directory structure FIRST
+- Code reviews MUST verify no feature logic outside packages/ (except shared/ infrastructure)
+- Planning documents MUST explicitly show packages/ structure before implementation
+- Gate checks MUST fail if functionality bypasses packages/ structure
+- Template updates needed to emphasize mandatory nature
+
+Templates Requiring Updates:
+⚠️ All specification templates - Add packages/ structure validation checklist
+⚠️ IMPLEMENTATION_ROADMAP.md - Emphasize packages/ creation as Phase 0/1 requirement
+⚠️ ARCHITECTURE.md - Add section on what can/cannot exist outside packages/
+⚠️ Code review checklist - Add packages/ structure verification
 
 Changes in v1.2.0:
 - Added 4 new core principles based on deep architectural comparison with React project
@@ -71,15 +95,30 @@ Original Principles Added in v1.0.0:
 
 ## Core Principles
 
-### I. Monorepo Package Architecture
+### I. Monorepo Package Architecture (NON-NEGOTIABLE)
 
-All functionality MUST be organized as packages in the `packages/` directory following this structure:
+**CRITICAL**: All functionality (except shared startup/build files) MUST be organized as packages in the `packages/` directory following this structure:
 - When a feature requires both frontend and backend: separate into `packages/[feature]-frt` and `packages/[feature]-srv`
 - Each package MUST contain a `base/` directory as the root implementation folder
 - Package naming convention: lowercase with hyphens (e.g., `clusters-frt`, `clusters-srv`)
 - Examples: `packages/clusters-frt/base/`, `packages/clusters-srv/base/`
+- **PROHIBITED**: Implementing feature functionality outside of `packages/` directory
+- **PROHIBITED**: Monolithic implementations that mix frontend and backend in single package (except for shared infrastructure libraries)
+- **MANDATORY**: All new features MUST create appropriate package(s) in `packages/` before implementation
 
-**Rationale**: This architecture enables future multi-implementation scenarios where one feature might have multiple database implementations or different frontend frameworks, all organized under their respective package with variant-specific subdirectories alongside `base/`.
+**Rationale**: This architecture is NON-NEGOTIABLE because it enables future migration of individual packages to separate repositories. Packages will gradually move to independent repos as the project matures. Any feature not in `packages/` will block this critical architectural evolution.
+
+**Permitted Outside `packages/` Directory**:
+- `shared/` - Only for truly cross-cutting concerns used by multiple packages (e.g., Universo.Types, Universo.Utils, Universo.I18n)
+- Root solution files (`.sln`, `Directory.Build.props`, `Directory.Packages.props`)
+- Configuration files (`.gitignore`, `.editorconfig`, `global.json`)
+- Documentation (root `README.md`, `CONTRIBUTING.md`, `LICENSE.md`, etc.)
+- Build/deployment scripts
+- `.github/` workflows and templates
+- `.specify/` memory and templates
+- `specs/` feature specifications
+
+**EXCEPTION**: The `shared/` directory is ONLY for infrastructure libraries that provide common types, utilities, and services consumed by multiple packages. Shared libraries MUST NOT contain feature-specific logic. If functionality is feature-specific, it MUST go in a package.
 
 ### II. Frontend/Backend Separation
 
@@ -356,4 +395,4 @@ All public APIs MUST implement rate limiting:
 
 **Rationale**: React's express-rate-limit middleware protects against abuse, DoS attacks, and resource exhaustion. Enterprise deployments require this protection from the start. Rate limiting also enables fair usage policies and prevents single users from monopolizing resources.
 
-**Version**: 1.2.0 | **Ratified**: 2025-11-17 | **Last Amended**: 2025-11-17
+**Version**: 1.3.0 | **Ratified**: 2025-11-17 | **Last Amended**: 2025-11-17

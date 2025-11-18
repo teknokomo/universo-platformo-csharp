@@ -43,13 +43,21 @@ Universo Platformo C# - это реализация концепции Universo 
 
 ## Monorepo Structure / Структура монорепозитория
 
-Unlike the React version that uses PNPM workspaces, the C# version uses .NET's native monorepo capabilities:
+**CRITICAL**: Unlike the React version that uses PNPM workspaces, the C# version uses .NET's native monorepo capabilities. **ALL functionality MUST be in `packages/` directory** (see Constitution Principle I - NON-NEGOTIABLE).
 
 ```
 universo-platformo-csharp/
 ├── src/
-│   ├── packages/              # Feature packages
-│   ├── shared/                # Shared libraries
+│   ├── packages/              # ⚠️ MANDATORY: ALL feature packages MUST be here
+│   │   ├── [feature]-frt/     # Frontend packages (Blazor WebAssembly)
+│   │   │   └── base/          # Primary implementation
+│   │   ├── [feature]-srv/     # Backend packages (ASP.NET Core)
+│   │   │   └── base/          # Primary implementation
+│   │   └── [feature]-common/  # Shared contracts/DTOs (optional)
+│   ├── shared/                # ⚠️ ONLY for cross-cutting infrastructure
+│   │   ├── Universo.Types/    # Common types/interfaces
+│   │   ├── Universo.Utils/    # Utility functions
+│   │   └── Universo.I18n/     # Internationalization
 │   ├── Universo.sln           # Main solution file
 │   ├── Directory.Build.props  # Shared MSBuild properties
 │   └── Directory.Packages.props # Centralized package versions
@@ -59,10 +67,35 @@ universo-platformo-csharp/
 │   └── Tests.sln              # Test solution
 ├── tools/
 │   └── build/                 # Build scripts
-├── docs/                      # Documentation
 ├── .github/                   # GitHub configuration
+├── .specify/                  # Memory and templates
+├── specs/                     # Feature specifications
 └── .gitignore                 # Git ignore rules
 ```
+
+### What Goes Where / Что где размещается
+
+**`packages/` Directory (MANDATORY for all features):**
+- ✅ All domain features (Clusters, Metaverses, Uniks, etc.)
+- ✅ Authentication packages (auth-frt, auth-srv)
+- ✅ Template packages (template-quiz, template-mmoomm)
+- ✅ Multiplayer infrastructure (multiplayer-colyseus-srv)
+- ✅ Any feature-specific functionality
+
+**`shared/` Directory (ONLY for infrastructure):**
+- ✅ Common types and interfaces (Universo.Types)
+- ✅ Utility functions (Universo.Utils)
+- ✅ Internationalization (Universo.I18n)
+- ✅ API client libraries (Universo.ApiClient)
+- ❌ NO feature-specific logic allowed
+
+**Root Level:**
+- ✅ Solution files, build configuration
+- ✅ Documentation (README, CONTRIBUTING, LICENSE)
+- ✅ Configuration files (.gitignore, .editorconfig)
+- ❌ NO implementation code allowed
+
+**Rationale**: This strict separation enables future migration of individual packages to separate repositories. Packages WILL gradually move to independent repos as the project matures.
 
 ### Directory.Build.props
 
@@ -99,7 +132,31 @@ Centralizes NuGet package versions (similar to PNPM's workspace dependencies):
 <details>
 <summary>In Russian</summary>
 
-В отличие от версии на React, использующей рабочие области PNPM, версия на C# использует нативные возможности монорепозитория .NET через файлы Directory.Build.props и Directory.Packages.props.
+**КРИТИЧНО**: В отличие от версии на React, использующей рабочие области PNPM, версия на C# использует нативные возможности монорепозитория .NET. **ВСЯ функциональность ДОЛЖНА быть в директории `packages/`** (см. Принцип I Конституции - НЕ ПОДЛЕЖИТ ОБСУЖДЕНИЮ).
+
+**Что где размещается:**
+
+**Директория `packages/` (ОБЯЗАТЕЛЬНО для всех функций):**
+- ✅ Все доменные функции (Кластеры, Метавселенные, Уники и т.д.)
+- ✅ Пакеты аутентификации (auth-frt, auth-srv)
+- ✅ Пакеты шаблонов (template-quiz, template-mmoomm)
+- ✅ Инфраструктура мультиплеера (multiplayer-colyseus-srv)
+- ✅ Любая функциональность, специфичная для функции
+
+**Директория `shared/` (ТОЛЬКО для инфраструктуры):**
+- ✅ Общие типы и интерфейсы (Universo.Types)
+- ✅ Вспомогательные функции (Universo.Utils)
+- ✅ Интернационализация (Universo.I18n)
+- ✅ Библиотеки API-клиентов (Universo.ApiClient)
+- ❌ Логика, специфичная для функций, НЕ допускается
+
+**Корневой уровень:**
+- ✅ Файлы решения, конфигурация сборки
+- ✅ Документация (README, CONTRIBUTING, LICENSE)
+- ✅ Файлы конфигурации (.gitignore, .editorconfig)
+- ❌ Код реализации НЕ допускается
+
+**Обоснование**: Это строгое разделение позволяет в будущем мигрировать отдельные пакеты в отдельные репозитории. Пакеты БУДУТ постепенно перемещаться в независимые репозитории по мере созревания проекта.
 </details>
 
 ## Package Architecture / Архитектура пакетов
