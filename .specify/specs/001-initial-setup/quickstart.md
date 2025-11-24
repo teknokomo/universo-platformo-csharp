@@ -385,13 +385,13 @@ dotnet test --filter "FullyQualifiedName~YourTestName"
 After completing initial setup:
 
 1. **Read Documentation**
-   - [README.md](../../README.md) - Project overview
-   - [CONTRIBUTING.md](../../CONTRIBUTING.md) - Contribution guidelines
-   - [Constitution](../../.specify/memory/constitution.md) - Core principles
+   - [README.md](../../../README.md) - Project overview
+   - [CONTRIBUTING.md](../../../CONTRIBUTING.md) - Contribution guidelines
+   - [Constitution](../../memory/constitution.md) - Core principles
 
 2. **Create GitHub Issue**
-   - Follow [github-issues.md](../../.github/instructions/github-issues.md)
-   - Use appropriate labels from [github-labels.md](../../.github/instructions/github-labels.md)
+   - Follow [github-issues.md](../../../.github/instructions/github-issues.md)
+   - Use appropriate labels from [github-labels.md](../../../.github/instructions/github-labels.md)
 
 3. **Implement First Feature**
    - Start with "Clusters" feature (three-entity pattern example)

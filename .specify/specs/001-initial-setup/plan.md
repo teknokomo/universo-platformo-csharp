@@ -133,7 +133,7 @@ specs/[###-feature]/
 │   ├── Universo.sln         # Single solution file
 │   ├── Directory.Build.props    # Shared build configuration
 │   └── Directory.Packages.props # Centralized package versions
-├── specs/                   # Feature specifications
+├── .specify/                # Spec Kit: memory, specs, templates, scripts
 ├── tests/                   # Integration tests
 ├── .editorconfig            # Code style rules
 ├── .gitignore
