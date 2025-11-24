@@ -68,8 +68,11 @@ universo-platformo-csharp/
 ├── tools/
 │   └── build/                 # Build scripts
 ├── .github/                   # GitHub configuration
-├── .specify/                  # Memory and templates
-├── specs/                     # Feature specifications
+├── .specify/                  # Spec Kit: memory, specs, templates, and scripts
+│   ├── memory/                # Project constitution and principles
+│   ├── specs/                 # Feature specifications (e.g., 001-initial-setup/)
+│   ├── templates/             # Specification templates
+│   └── scripts/               # Workflow automation scripts
 └── .gitignore                 # Git ignore rules
 ```
 
