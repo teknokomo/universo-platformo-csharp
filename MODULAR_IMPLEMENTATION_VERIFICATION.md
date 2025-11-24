@@ -75,7 +75,7 @@ The user requested deep verification that the implementation plan MANDATES modul
 **CRITICAL PRE-REQUISITE**: All work in Phase 1 and beyond MUST follow Constitution Principle I - Monorepo Package Architecture (NON-NEGOTIABLE). The `packages/` directory structure is MANDATORY before any feature implementation begins.
 ```
 
-### ✅ specs/001-initial-setup/plan.md Updates
+### ✅ .specify/specs/001-initial-setup/plan.md Updates
 
 **Changes Made**:
 - ✅ Updated Constitution Check to reference v1.3.0
@@ -149,7 +149,7 @@ From `REACT_PROJECT_ANALYSIS.md`:
 1. ✅ `.specify/memory/constitution.md` (v1.3.0)
 2. ✅ `ARCHITECTURE.md`
 3. ✅ `IMPLEMENTATION_ROADMAP.md`
-4. ✅ `specs/001-initial-setup/plan.md`
+4. ✅ `.specify/specs/001-initial-setup/plan.md`
 5. ✅ `.github/CODE_REVIEW_CHECKLIST.md` (NEW)
 6. ✅ `README.md`
 7. ✅ `README-RU.md`

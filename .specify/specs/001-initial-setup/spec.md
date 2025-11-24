@@ -170,9 +170,9 @@ Universo Platformo is being created in multiple technology stack implementations
 ## References
 
 - [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
-- [Constitution](.specify/memory/constitution.md)
-- [GitHub Issue Guidelines](.github/instructions/github-issues.md)
-- [GitHub PR Guidelines](.github/instructions/github-pr.md)
-- [GitHub Labels](.github/instructions/github-labels.md)
+- [Constitution](../../memory/constitution.md)
+- [GitHub Issue Guidelines](../../../.github/instructions/github-issues.md)
+- [GitHub PR Guidelines](../../../.github/instructions/github-pr.md)
+- [GitHub Labels](../../../.github/instructions/github-labels.md)
 - [Blazor Documentation](https://learn.microsoft.com/en-us/aspnet/core/blazor/)
 - [MudBlazor](https://mudblazor.com/)

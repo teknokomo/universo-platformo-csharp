@@ -1,7 +1,7 @@
 # Tasks: Initial Project Setup
 
 **Feature ID**: 001-initial-setup  
-**Input**: Design documents from `/specs/001-initial-setup/`  
+**Input**: Design documents from `.specify/specs/001-initial-setup/`  
 **Prerequisites**: plan.md (✅), spec.md (✅), research.md (✅), data-model.md (✅), contracts/ (✅)
 
 **Tests**: Tests are NOT explicitly requested in the feature specification. Focus on infrastructure setup and validation through build/compilation.

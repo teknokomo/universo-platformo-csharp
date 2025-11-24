@@ -1,7 +1,7 @@
 # Implementation Plan: Initial Project Setup
 
 **Branch**: `001-initial-setup` | **Date**: 2025-11-17 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-initial-setup/spec.md`
+**Input**: Feature specification from `.specify/specs/001-initial-setup/spec.md`
 
 ## Summary
 
@@ -133,7 +133,7 @@ specs/[###-feature]/
 │   ├── Universo.sln         # Single solution file
 │   ├── Directory.Build.props    # Shared build configuration
 │   └── Directory.Packages.props # Centralized package versions
-├── specs/                   # Feature specifications
+├── .specify/                # Spec Kit: memory, specs, templates, scripts
 ├── tests/                   # Integration tests
 ├── .editorconfig            # Code style rules
 ├── .gitignore
