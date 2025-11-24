@@ -1,7 +1,7 @@
 # Implementation Plan: Initial Project Setup
 
 **Branch**: `001-initial-setup` | **Date**: 2025-11-17 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-initial-setup/spec.md`
+**Input**: Feature specification from `.specify/specs/001-initial-setup/spec.md`
 
 ## Summary
 
