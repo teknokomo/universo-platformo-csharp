@@ -313,6 +313,163 @@
 
 ---
 
+## Phase 9.5: Main Application Host & Shell (Priority: P1) 🎯 CRITICAL
+
+**Goal**: Create the main application shell that composes and hosts all feature packages
+
+**Independent Test**: Application starts, displays navigation, routes between package pages
+
+**Functional Requirement**: Application entry point that integrates all packages (CRITICAL infrastructure)
+
+**⚠️ CRITICAL**: This phase creates the actual runnable application that hosts all packages. Without this, individual packages cannot be integrated or run together.
+
+### Backend API Host
+
+- [ ] T142.1 [US-HOST] Create `src/packages/api-host-srv/base/` package structure
+- [ ] T142.2 [US-HOST] Create api-host-srv.csproj in `src/packages/api-host-srv/base/`
+- [ ] T142.3 [P] [US-HOST] Create Program.cs with ASP.NET Core Web API configuration
+- [ ] T142.4 [P] [US-HOST] Configure service registration from all -srv packages
+- [ ] T142.5 [P] [US-HOST] Configure middleware pipeline (error handling, rate limiting, caching)
+- [ ] T142.6 [P] [US-HOST] Configure Swagger/OpenAPI documentation aggregation
+- [ ] T142.7 [US-HOST] Configure CORS for Blazor frontend
+- [ ] T142.8 [US-HOST] Configure JWT authentication middleware
+- [ ] T142.9 [P] [US-HOST] Create appsettings.json with Supabase and database configuration
+- [ ] T142.10 [P] [US-HOST] Create appsettings.Development.json
+- [ ] T142.11 [P] [US-HOST] Create appsettings.Production.json
+- [ ] T142.12 [US-HOST] Configure Redis distributed caching connection
+- [ ] T142.13 [US-HOST] Configure distributed rate limiting with Redis
+- [ ] T142.14 [US-HOST] Add api-host-srv to solution and build
+- [ ] T142.15 [P] [US-HOST] Create Package README.md for api-host-srv (English)
+- [ ] T142.16 [P] [US-HOST] Create Package README-RU.md for api-host-srv (Russian)
+
+### Frontend Application Shell
+
+- [ ] T142.17 [US-HOST] Create `src/packages/app-shell-frt/base/` package structure
+- [ ] T142.18 [US-HOST] Create app-shell-frt.csproj in `src/packages/app-shell-frt/base/`
+- [ ] T142.19 [P] [US-HOST] Create App.razor with router configuration
+- [ ] T142.20 [P] [US-HOST] Create MainLayout.razor with MudBlazor layout
+- [ ] T142.21 [P] [US-HOST] Create NavMenu.razor with navigation between packages
+- [ ] T142.22 [P] [US-HOST] Create Footer.razor component
+- [ ] T142.23 [P] [US-HOST] Create AppBar.razor with user menu and settings
+- [ ] T142.24 [US-HOST] Configure MudBlazor theme and styling
+- [ ] T142.25 [US-HOST] Configure routing to all -frt package pages
+- [ ] T142.26 [US-HOST] Configure AuthorizeRouteView for protected routes
+- [ ] T142.27 [P] [US-HOST] Create Home page in `src/packages/app-shell-frt/base/Pages/Home.razor`
+- [ ] T142.28 [P] [US-HOST] Create NotFound page in `src/packages/app-shell-frt/base/Pages/NotFound.razor`
+- [ ] T142.29 [P] [US-HOST] Create Error page in `src/packages/app-shell-frt/base/Pages/Error.razor`
+- [ ] T142.30 [US-HOST] Configure HTTP client for API communication
+- [ ] T142.31 [US-HOST] Add app-shell-frt to solution and build
+- [ ] T142.32 [P] [US-HOST] Create bilingual navigation labels
+- [ ] T142.33 [P] [US-HOST] Create Package README.md for app-shell-frt (English)
+- [ ] T142.34 [P] [US-HOST] Create Package README-RU.md for app-shell-frt (Russian)
+
+### Shared API Client Library
+
+- [ ] T142.35 [US-HOST] Create `src/packages/universo-api-client/base/` package structure
+- [ ] T142.36 [US-HOST] Create universo-api-client.csproj in `src/packages/universo-api-client/base/`
+- [ ] T142.37 [P] [US-HOST] Implement BaseApiClient abstract class in `src/packages/universo-api-client/base/Client/BaseApiClient.cs`
+- [ ] T142.38 [P] [US-HOST] Implement IApiClient interface in `src/packages/universo-api-client/base/Client/IApiClient.cs`
+- [ ] T142.39 [P] [US-HOST] Implement ApiResponse handling in `src/packages/universo-api-client/base/Models/ApiResponseExtensions.cs`
+- [ ] T142.40 [US-HOST] Implement authentication token injection
+- [ ] T142.41 [US-HOST] Add universo-api-client to solution
+- [ ] T142.42 [P] [US-HOST] Create Package README.md for universo-api-client (English)
+- [ ] T142.43 [P] [US-HOST] Create Package README-RU.md for universo-api-client (Russian)
+
+### Integration Verification
+
+- [ ] T142.44 [US-HOST] Build full solution with all host packages
+- [ ] T142.45 [US-HOST] Run backend API host and verify Swagger UI
+- [ ] T142.46 [US-HOST] Run frontend app shell and verify navigation
+- [ ] T142.47 [US-HOST] Create integration tests for API host startup
+- [ ] T142.48 [US-HOST] Create E2E test for frontend navigation
+
+**Checkpoint**: Application shell ready - backend API host running and frontend shell navigating
+
+---
+
+## Phase 9.6: User Profile Feature (Priority: P2)
+
+**Goal**: Implement user profile management to match React reference (profile-frt, profile-srv)
+
+**Independent Test**: Authenticated user can view and update their profile
+
+**Functional Requirement**: User profile management (from React reference packages)
+
+### Implementation for User Profile
+
+- [ ] T142.49 [US-PROFILE] Create `src/packages/profile-srv/base/` package structure
+- [ ] T142.50 [US-PROFILE] Create profile-srv.csproj in `src/packages/profile-srv/base/`
+- [ ] T142.51 [P] [US-PROFILE] Implement UserProfile entity in `src/packages/profile-srv/base/Models/UserProfile.cs`
+- [ ] T142.52 [P] [US-PROFILE] Implement ProfileController in `src/packages/profile-srv/base/Controllers/ProfileController.cs`
+- [ ] T142.53 [P] [US-PROFILE] Implement ProfileService in `src/packages/profile-srv/base/Services/ProfileService.cs`
+- [ ] T142.54 [P] [US-PROFILE] Implement ProfileRepository in `src/packages/profile-srv/base/Repositories/ProfileRepository.cs`
+- [ ] T142.55 [US-PROFILE] Create `src/packages/profile-frt/base/` package structure
+- [ ] T142.56 [US-PROFILE] Create profile-frt.csproj in `src/packages/profile-frt/base/`
+- [ ] T142.57 [P] [US-PROFILE] Implement Profile page in `src/packages/profile-frt/base/Pages/Profile.razor`
+- [ ] T142.58 [P] [US-PROFILE] Implement ProfileForm component in `src/packages/profile-frt/base/Components/ProfileForm.razor`
+- [ ] T142.59 [P] [US-PROFILE] Implement AvatarUpload component in `src/packages/profile-frt/base/Components/AvatarUpload.razor`
+- [ ] T142.60 [US-PROFILE] Add profile packages to solution
+- [ ] T142.61 [P] [US-PROFILE] Create bilingual README files for profile packages
+
+**Checkpoint**: User profile management complete
+
+---
+
+## Phase 9.7: Organizations Feature (Priority: P3)
+
+**Goal**: Implement organization/team management to match React reference (organizations-frt, organizations-srv)
+
+**Independent Test**: Users can create organizations and invite team members
+
+**Functional Requirement**: Organization management (from React reference packages)
+
+### Implementation for Organizations
+
+- [ ] T142.62 [US-ORG] Create `src/packages/organizations-srv/base/` package structure
+- [ ] T142.63 [US-ORG] Create organizations-srv.csproj in `src/packages/organizations-srv/base/`
+- [ ] T142.64 [P] [US-ORG] Implement Organization entity in `src/packages/organizations-srv/base/Models/Organization.cs`
+- [ ] T142.65 [P] [US-ORG] Implement OrganizationMember entity in `src/packages/organizations-srv/base/Models/OrganizationMember.cs`
+- [ ] T142.66 [P] [US-ORG] Implement OrganizationController in `src/packages/organizations-srv/base/Controllers/OrganizationController.cs`
+- [ ] T142.67 [P] [US-ORG] Implement OrganizationService in `src/packages/organizations-srv/base/Services/OrganizationService.cs`
+- [ ] T142.68 [US-ORG] Create `src/packages/organizations-frt/base/` package structure
+- [ ] T142.69 [US-ORG] Create organizations-frt.csproj in `src/packages/organizations-frt/base/`
+- [ ] T142.70 [P] [US-ORG] Implement OrganizationList page in `src/packages/organizations-frt/base/Pages/OrganizationList.razor`
+- [ ] T142.71 [P] [US-ORG] Implement OrganizationSettings page in `src/packages/organizations-frt/base/Pages/OrganizationSettings.razor`
+- [ ] T142.72 [P] [US-ORG] Implement MemberInvite component in `src/packages/organizations-frt/base/Components/MemberInvite.razor`
+- [ ] T142.73 [US-ORG] Add organizations packages to solution
+- [ ] T142.74 [P] [US-ORG] Create bilingual README files for organizations packages
+
+**Checkpoint**: Organization management complete
+
+---
+
+## Phase 9.8: Storage Feature (Priority: P3)
+
+**Goal**: Implement file/asset storage management to match React reference (storages-frt, storages-srv)
+
+**Independent Test**: Users can upload, list, and manage files
+
+**Functional Requirement**: Storage management (from React reference packages)
+
+### Implementation for Storage
+
+- [ ] T142.75 [US-STORAGE] Create `src/packages/storages-srv/base/` package structure
+- [ ] T142.76 [US-STORAGE] Create storages-srv.csproj in `src/packages/storages-srv/base/`
+- [ ] T142.77 [P] [US-STORAGE] Implement StorageFile entity in `src/packages/storages-srv/base/Models/StorageFile.cs`
+- [ ] T142.78 [P] [US-STORAGE] Implement StorageController in `src/packages/storages-srv/base/Controllers/StorageController.cs`
+- [ ] T142.79 [P] [US-STORAGE] Implement StorageService with Supabase Storage in `src/packages/storages-srv/base/Services/StorageService.cs`
+- [ ] T142.80 [US-STORAGE] Create `src/packages/storages-frt/base/` package structure
+- [ ] T142.81 [US-STORAGE] Create storages-frt.csproj in `src/packages/storages-frt/base/`
+- [ ] T142.82 [P] [US-STORAGE] Implement FileList page in `src/packages/storages-frt/base/Pages/FileList.razor`
+- [ ] T142.83 [P] [US-STORAGE] Implement FileUpload component in `src/packages/storages-frt/base/Components/FileUpload.razor`
+- [ ] T142.84 [P] [US-STORAGE] Implement FilePreview component in `src/packages/storages-frt/base/Components/FilePreview.razor`
+- [ ] T142.85 [US-STORAGE] Add storages packages to solution
+- [ ] T142.86 [P] [US-STORAGE] Create bilingual README files for storages packages
+
+**Checkpoint**: Storage management complete
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -331,6 +488,12 @@ Phase 2 (Foundational) ← BLOCKS all user stories
 Phase 8 (Health Check Package - Validation)
     ↓
 Phase 9 (Polish)
+    ↓
+Phase 9.5 (Main Application Host) [P1] 🎯 CRITICAL ← Application entry point
+    ↓
+    ├→ Phase 9.6 (User Profile) [P2]
+    ├→ Phase 9.7 (Organizations) [P3]
+    └→ Phase 9.8 (Storage) [P3]
 ```
 
 ### User Story Dependencies
@@ -341,6 +504,7 @@ Phase 9 (Polish)
 - **US2 (Documentation) [P1]**: Depends on Foundational - Can run in parallel with US1, US4, US5
 - **US3 (GitHub Integration) [P2]**: Depends on Foundational - Can run in parallel with other stories but lower priority
 - **US4 (Build System) [P1]**: Depends on Foundational - Can run in parallel with US1, US2, US5
+- **Phase 9.5 (Main Application Host) [P1]**: **CRITICAL** - Depends on Phase 9, provides runnable application shell
 - **US5 (Database Abstraction) [P1]**: Depends on Foundational - Can run in parallel with US1, US2, US4
 - **Phase 8 (Health Check)**: Depends on all P1 stories being complete
 - **Phase 9 (Polish)**: Depends on all phases being complete
@@ -941,6 +1105,12 @@ Phase 2 (Foundational) ← BLOCKS all user stories
          ↓
     Phase 9 (Polish Setup)
          ↓
+    Phase 9.5 (Main Application Host) [P1] 🎯 CRITICAL ← Application entry point
+         ↓
+         ├→ Phase 9.6 (User Profile) [P2]
+         ├→ Phase 9.7 (Organizations) [P3]
+         └→ Phase 9.8 (Storage) [P3]
+              ↓
     Phase 10 (US6: Authentication) [P1] 🎯 ← BLOCKS feature access
          ↓
          ├→ Phase 11 (US7: Clusters) [P1] 🎯
@@ -967,6 +1137,10 @@ Phase 2 (Foundational) ← BLOCKS all user stories
 **MVP Core (Can run in parallel after foundation):**
 - Phase 3-9: Initial setup phases
 
+**Application Host (CRITICAL):**
+- Phase 9.5 (Main Application Host): BLOCKS all runnable features - provides API host and frontend shell
+- Phase 9.6-9.8 (Profile, Organizations, Storage): Can run in parallel after 9.5
+
 **Feature Prerequisites:**
 - Phase 10 (Authentication): BLOCKS all domain features requiring user auth
 
@@ -992,6 +1166,13 @@ Phase 2 (Foundational) ← BLOCKS all user stories
 Developer A: Phases 3-9 (infrastructure setup)
 ```
 
+**After Phase 9.5 (Application Host) completes:**
+```bash
+Developer A: Phase 9.6 (Profile)
+Developer B: Phase 9.7 (Organizations)
+Developer C: Phase 9.8 (Storage)
+```
+
 **After Phase 10 (Auth) completes:**
 ```bash
 Team 1: Phase 11 (Clusters)
@@ -1009,7 +1190,7 @@ Team 2: Phase 16 (UPDL Nodes)
 
 ## Updated Task Summary
 
-**Total Tasks**: 360 (was 142, added 218 new tasks)
+**Total Tasks**: 446 (was 360, added 86 new tasks in Phases 9.5-9.8)
 
 **Breakdown by Phase**:
 - Phase 1 (Setup): 8 tasks
@@ -1021,27 +1202,39 @@ Team 2: Phase 16 (UPDL Nodes)
 - Phase 7 (US5 - Database Abstraction): 17 tasks [P1]
 - Phase 8 (Health Check Package): 18 tasks
 - Phase 9 (Polish Setup): 14 tasks
-- **Phase 10 (US6 - Authentication): 24 tasks [P1] 🎯 NEW**
-- **Phase 11 (US7 - Clusters): 29 tasks [P1] 🎯 NEW**
-- **Phase 12 (US8 - Metaverses): 21 tasks [P1] 🎯 NEW**
-- **Phase 13 (US9 - Uniks): 20 tasks [P1] 🎯 NEW**
-- **Phase 14 (US10 - Spaces/Canvases): 21 tasks [P2] NEW**
-- **Phase 15 (US11 - LangChain Nodes): 24 tasks [P2] NEW**
-- **Phase 16 (US12 - UPDL Nodes): 20 tasks [P2] NEW**
-- **Phase 17 (US13 - Publishing): 20 tasks [P2] NEW**
-- **Phase 18 (US14 - Templates): 14 tasks [P3] NEW**
-- **Phase 19 (Final Integration): 25 tasks NEW**
+- **Phase 9.5 (Main Application Host): 48 tasks [P1] 🎯 CRITICAL NEW**
+- **Phase 9.6 (User Profile): 13 tasks [P2] NEW**
+- **Phase 9.7 (Organizations): 13 tasks [P3] NEW**
+- **Phase 9.8 (Storage): 12 tasks [P3] NEW**
+- Phase 10 (US6 - Authentication): 24 tasks [P1] 🎯
+- Phase 11 (US7 - Clusters): 29 tasks [P1] 🎯
+- Phase 12 (US8 - Metaverses): 21 tasks [P1] 🎯
+- Phase 13 (US9 - Uniks): 20 tasks [P1] 🎯
+- Phase 14 (US10 - Spaces/Canvases): 21 tasks [P2]
+- Phase 15 (US11 - LangChain Nodes): 24 tasks [P2]
+- Phase 16 (US12 - UPDL Nodes): 20 tasks [P2]
+- Phase 17 (US13 - Publishing): 20 tasks [P2]
+- Phase 18 (US14 - Templates): 14 tasks [P3]
+- Phase 19 (Final Integration): 25 tasks
 
 **Parallelizable Tasks**: Significantly increased with new phases
 
 **MVP Scope** (P1 priorities): 
-- **Infrastructure MVP**: Phases 1-9 = 142 tasks
+- **Infrastructure MVP**: Phases 1-9.5 = 190 tasks (includes application host)
 - **Feature MVP**: Phases 10-13 (Auth, Clusters, Metaverses, Uniks) = 94 tasks
-- **Total MVP**: 236 tasks
+- **Total MVP**: 284 tasks
 
-**Full Feature Set**: All 360 tasks for complete platform
+**Full Feature Set**: All 446 tasks for complete platform
 
 **Constitution Compliance**: ✅ All 14 principles addressed across all phases
+
+**New Packages Added** (matching React reference):
+- api-host-srv: Backend API aggregation host
+- app-shell-frt: Frontend Blazor application shell
+- universo-api-client: Shared API client library
+- profile-frt/profile-srv: User profile management
+- organizations-frt/organizations-srv: Team/organization management
+- storages-frt/storages-srv: File storage management
 
 ---
 
@@ -1049,43 +1242,49 @@ Team 2: Phase 16 (UPDL Nodes)
 
 ### MVP First (Minimum Viable Product)
 
-**Infrastructure MVP (Phases 1-9)**: 142 tasks
+**Infrastructure MVP (Phases 1-9.5)**: 190 tasks
 1. Complete Phase 1: Setup
 2. Complete Phase 2: Foundational ← **CRITICAL BLOCKER**
 3. Complete Phases 3-7: Core infrastructure [P1]
 4. Complete Phases 8-9: Validation and polish
+5. Complete Phase 9.5: Main Application Host ← **CRITICAL - Application entry point**
 
 **Feature MVP (Phases 10-13)**: 94 tasks
-5. Complete Phase 10: Authentication [P1] 🎯
-6. Complete Phase 11: Clusters [P1] 🎯
-7. Complete Phase 12: Metaverses [P1] 🎯
-8. Complete Phase 13: Uniks [P1] 🎯
+6. Complete Phase 10: Authentication [P1] 🎯
+7. Complete Phase 11: Clusters [P1] 🎯
+8. Complete Phase 12: Metaverses [P1] 🎯
+9. Complete Phase 13: Uniks [P1] 🎯
 
 **VALIDATE MVP**: Can users authenticate, create workspaces, manage clusters/metaverses?
 
-### Extended Features (Phases 14-18): 124 tasks
-9. Complete Phase 14: Spaces/Canvases [P2]
-10. Complete Phase 15: LangChain Nodes [P2]
-11. Complete Phase 16: UPDL Nodes [P2]
-12. Complete Phase 17: Publishing System [P2]
-13. Complete Phase 18: Template System [P3]
+### Extended Features (Phases 9.6-9.8, 14-18): 162 tasks
+10. Complete Phase 9.6: User Profile [P2]
+11. Complete Phase 9.7: Organizations [P3]
+12. Complete Phase 9.8: Storage [P3]
+13. Complete Phase 14: Spaces/Canvases [P2]
+14. Complete Phase 15: LangChain Nodes [P2]
+15. Complete Phase 16: UPDL Nodes [P2]
+16. Complete Phase 17: Publishing System [P2]
+17. Complete Phase 18: Template System [P3]
 
 ### Final Polish (Phase 19): 25 tasks
-14. Complete Phase 19: Integration & Documentation
+18. Complete Phase 19: Integration & Documentation
 
 ### Incremental Delivery Checkpoints (Extended)
 
 1. **Checkpoint 1-9**: Infrastructure ready (original phases)
-2. **Checkpoint 10**: Authentication working - users can login
-3. **Checkpoint 11**: Clusters working - Three-Entity Pattern validated
-4. **Checkpoint 12**: Metaverses working - second domain functional
-5. **Checkpoint 13**: Uniks working - workspace management ready
-6. **Checkpoint 14**: Visual flow editor operational
-7. **Checkpoint 15**: LangChain nodes functional - AI integration ready
-8. **Checkpoint 16**: UPDL nodes functional - 3D/AR/VR capable
-9. **Checkpoint 17**: Publishing working - can export applications
-10. **Checkpoint 18**: Templates working - multiple output formats
-11. **Checkpoint 19**: **PRODUCTION READY** - complete platform
+2. **Checkpoint 9.5**: Application shell ready - API host running, frontend navigating 🎯 CRITICAL
+3. **Checkpoint 9.6-9.8**: Profile, Organizations, Storage features ready
+4. **Checkpoint 10**: Authentication working - users can login
+5. **Checkpoint 11**: Clusters working - Three-Entity Pattern validated
+6. **Checkpoint 12**: Metaverses working - second domain functional
+7. **Checkpoint 13**: Uniks working - workspace management ready
+8. **Checkpoint 14**: Visual flow editor operational
+9. **Checkpoint 15**: LangChain nodes functional - AI integration ready
+10. **Checkpoint 16**: UPDL nodes functional - 3D/AR/VR capable
+11. **Checkpoint 17**: Publishing working - can export applications
+12. **Checkpoint 18**: Templates working - multiple output formats
+13. **Checkpoint 19**: **PRODUCTION READY** - complete platform
 
 ### Parallel Team Strategy (Extended)
 
@@ -1093,7 +1292,12 @@ Team 2: Phase 16 (UPDL Nodes)
 ```
 Foundation Team (2 devs): Phases 1-9 (infrastructure)
     ↓
-Dev A + B: Phase 10 (Authentication) ← BLOCKER
+Dev A + B: Phase 9.5 (Application Host) ← CRITICAL
+    ↓
+Dev A: Phase 9.6 (Profile)
+Dev B: Phase 9.7 (Organizations)
+Dev C: Phase 9.8 (Storage)
+Dev D + E: Phase 10 (Authentication) ← BLOCKER for domain features
     ↓
 Dev A: Phase 11 (Clusters)
 Dev B: Phase 12 (Metaverses)
@@ -1113,22 +1317,30 @@ All Devs: Phase 19 (Final integration & polish)
 
 **Solo developer (priority order)**:
 ```
-Phases 1-9 → Phase 10 → Phase 11 → Phase 12 → Phase 13 → 
-Phase 14 → Phase 15 → Phase 16 → Phase 17 → Phase 18 → Phase 19
+Phases 1-9 → Phase 9.5 (Host) → Phase 10 (Auth) → Phase 11-13 (Clusters/Metaverses/Uniks) → 
+Phase 14 (Spaces) → Phases 15-16 (Nodes) → Phase 17 (Publishing) → Phase 18 (Templates) → Phase 19
 ```
 
 ---
 
 ## Success Validation (Extended)
 
-Upon completion of all 360 tasks:
+Upon completion of all 446 tasks:
 
-### Infrastructure (Phases 1-9):
+### Infrastructure (Phases 1-9.5):
 ✅ Repository has `src/packages/` directory structure  
 ✅ All documentation is bilingual  
 ✅ Solution builds successfully  
 ✅ Database abstraction layer working  
 ✅ Health check endpoints functional
+✅ **API host running with Swagger documentation**
+✅ **Frontend shell navigating between packages**
+✅ **Shared API client library available**
+
+### Supporting Features (Phases 9.6-9.8):
+✅ Users can view and update their profile  
+✅ Users can create and manage organizations/teams  
+✅ Users can upload and manage files
 
 ### Core Features (Phases 10-13):
 ✅ Users can register, login, logout  
@@ -1151,6 +1363,48 @@ Upon completion of all 360 tasks:
 ✅ Performance meets requirements (<200ms API, 60fps UI)  
 ✅ Security audit passed  
 ✅ **READY FOR PRODUCTION DEPLOYMENT**
+
+---
+
+## Notes
+
+### Terminology Clarification
+
+- **Unik** = **Workspace**: These terms are used interchangeably. A Unik is the top-level container for user projects (similar to "Workspace" in other platforms)
+- **Space** contains **Canvas**: A Space is the mid-level grouping entity that contains Canvases where visual flows are created
+- **Node**: A building block in the visual flow editor (LangChain nodes, UPDL nodes, etc.)
+
+### Package Naming Convention
+
+Packages follow the React reference naming with C#-specific adaptations:
+- `-frt`: Frontend (Blazor WebAssembly)
+- `-srv`: Server/Backend (ASP.NET Core)
+- `-common`: Shared contracts and models (when needed)
+- `base/`: Primary implementation directory within each package
+
+### React Reference Alignment
+
+This tasks list creates C# equivalents for all major packages from the React reference:
+
+| React Package | C# Package | Status |
+|---------------|------------|--------|
+| auth-frt/auth-srv | auth-frt/auth-srv | ✅ Included |
+| clusters-frt/clusters-srv | clusters-frt/clusters-srv | ✅ Included |
+| metaverses-frt/metaverses-srv | metaverses-frt/metaverses-srv | ✅ Included |
+| uniks-frt/uniks-srv | uniks-frt/uniks-srv | ✅ Included |
+| spaces-frt/spaces-srv | spaces-frt/spaces-srv | ✅ Included |
+| publish-frt/publish-srv | publish-frt/publish-srv | ✅ Included |
+| profile-frt/profile-srv | profile-frt/profile-srv | ✅ Included (Phase 9.6) |
+| organizations-frt/organizations-srv | organizations-frt/organizations-srv | ✅ Included (Phase 9.7) |
+| storages-frt/storages-srv | storages-frt/storages-srv | ✅ Included (Phase 9.8) |
+| flowise-components | nodes-langchain-srv | ✅ Cleaner package name |
+| updl/base | updl-frt/updl-srv | ✅ Included |
+| template-quiz | template-quiz | ✅ Included |
+| template-mmoomm | template-mmoomm | ✅ Included |
+| universo-api-client | universo-api-client | ✅ Included (Phase 9.5) |
+| universo-types | Universo.Types (shared/) | ✅ Infrastructure |
+| universo-utils | Universo.Utils (shared/) | ✅ Infrastructure |
+| universo-i18n | Universo.I18n (shared/) | ✅ Infrastructure |
 
 ---
 
