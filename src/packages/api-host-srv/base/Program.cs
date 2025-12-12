@@ -78,11 +78,14 @@ public class Program
             });
         });
 
-        // Add CORS support (will be configured in T142.7)
+        // Add CORS support (will be configured in T142.7 with specific origins)
+        // TODO T142.7: Replace with specific allowed origins for Blazor frontend
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {
+                // Temporary permissive policy for development
+                // MUST be restricted to specific origins in production
                 policy.AllowAnyOrigin()
                       .AllowAnyMethod()
                       .AllowAnyHeader();
@@ -98,12 +101,13 @@ public class Program
         // Add distributed cache (Redis will be configured in T142.12)
         services.AddDistributedMemoryCache();
 
-        // Add rate limiting (will be configured in T142.5 and T142.13)
+        // Add rate limiting (will be further configured in T142.5 and T142.13)
         services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+                    // Use remote IP for rate limiting (more secure than Host header)
+                    partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                     factory: partition => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true,
@@ -123,13 +127,15 @@ public class Program
     /// </summary>
     private static void ConfigureMiddleware(WebApplication app)
     {
-        // Enable Swagger in all environments for initial setup
-        // This can be restricted to development later
+        // Enable Swagger (will be restricted to development in production deployments)
+        // TODO: Consider restricting to Development environment only for security
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Universo Platformo API v1");
-            options.RoutePrefix = string.Empty; // Serve Swagger at root
+            // Serve Swagger at root for initial development
+            // TODO: Use a secure path like "api/docs" in production
+            options.RoutePrefix = string.Empty;
         });
 
         // Use HTTPS redirection in production
