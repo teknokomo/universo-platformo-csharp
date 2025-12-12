@@ -325,9 +325,9 @@
 
 ### Backend API Host
 
-- [ ] T142.1 [US-HOST] Create `src/packages/api-host-srv/base/` package structure
-- [ ] T142.2 [US-HOST] Create api-host-srv.csproj in `src/packages/api-host-srv/base/`
-- [ ] T142.3 [P] [US-HOST] Create Program.cs with ASP.NET Core Web API configuration
+- [X] T142.1 [US-HOST] Create `src/packages/api-host-srv/base/` package structure
+- [X] T142.2 [US-HOST] Create api-host-srv.csproj in `src/packages/api-host-srv/base/`
+- [X] T142.3 [P] [US-HOST] Create Program.cs with ASP.NET Core Web API configuration
 - [ ] T142.4 [P] [US-HOST] Configure service registration from all -srv packages
 - [ ] T142.5 [P] [US-HOST] Configure middleware pipeline (error handling, rate limiting, caching)
 - [ ] T142.6 [P] [US-HOST] Configure Swagger/OpenAPI documentation aggregation
@@ -338,7 +338,7 @@
 - [ ] T142.11 [P] [US-HOST] Create appsettings.Production.json
 - [ ] T142.12 [US-HOST] Configure Redis distributed caching connection
 - [ ] T142.13 [US-HOST] Configure distributed rate limiting with Redis
-- [ ] T142.14 [US-HOST] Add api-host-srv to solution and build
+- [X] T142.14 [US-HOST] Add api-host-srv to solution and build
 - [ ] T142.15 [P] [US-HOST] Create Package README.md for api-host-srv (English)
 - [ ] T142.16 [P] [US-HOST] Create Package README-RU.md for api-host-srv (Russian)
 

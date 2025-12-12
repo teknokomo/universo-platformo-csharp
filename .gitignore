@@ -161,8 +161,9 @@ nCrunchTemp_*
 ## NuGet
 *.nupkg
 *.snupkg
-**/packages/*
-!**/packages/build/
+# NuGet packages directory (but NOT our src/packages source code)
+packages/
+!src/packages/
 *.nuget.props
 *.nuget.targets
 project.lock.json
