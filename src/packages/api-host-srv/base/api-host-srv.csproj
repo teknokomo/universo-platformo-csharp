@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>UniversoPlatformo.ApiHost</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ASP.NET Core packages are included via Microsoft.NET.Sdk.Web -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Shared infrastructure references -->
+    <ProjectReference Include="../../../shared/Universo.Types/Universo.Types.csproj" />
+    <ProjectReference Include="../../../shared/Universo.Utils/Universo.Utils.csproj" />
+    <ProjectReference Include="../../../shared/Universo.I18n/Universo.I18n.csproj" />
+  </ItemGroup>
+
+</Project>
