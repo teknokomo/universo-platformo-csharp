@@ -2,12 +2,16 @@
 
 This document outlines the architecture and design decisions for the C# implementation of Universo Platformo.
 
+> **📖 Related Documentation**: For a comprehensive guide on the technology stack (build system and authorization), see [TECH_STACK.md](TECH_STACK.md) ([Russian version](TECH_STACK-RU.md))
+
 <details>
 <summary>In Russian</summary>
 
 # Universo Platformo C# - Документация архитектуры
 
 Этот документ описывает архитектуру и проектные решения для реализации Universo Platformo на C#.
+
+> **📖 Связанная документация**: Для полного руководства по технологическому стеку (система сборки и авторизация), см. [TECH_STACK-RU.md](TECH_STACK-RU.md) ([English version](TECH_STACK.md))
 </details>
 
 ## Table of Contents / Содержание
@@ -2350,6 +2354,40 @@ app.Use(async (context, next) =>
 <summary>In Russian</summary>
 
 Реализуйте ограничение скорости для защиты от злоупотреблений и DoS-атак. Настройте CORS правильно для безопасного взаимодействия между фронтендом и бэкендом. Добавьте заголовки безопасности для защиты от распространенных уязвимостей.
+</details>
+
+## Related Documentation / Связанная документация
+
+For more detailed information on specific topics, see:
+
+- **[TECH_STACK.md](TECH_STACK.md)** / **[TECH_STACK-RU.md](TECH_STACK-RU.md)** - Comprehensive guide to the technology stack
+  - Build System and Package Management (MSBuild, NuGet, .NET Solution)
+  - Authorization System (ASP.NET Core Identity, JWT, Supabase)
+  - Complete technology mapping from React to C#
+  - Development workflow and production deployment
+  
+- **[README.md](README.md)** / **[README-RU.md](README-RU.md)** - Project overview and getting started guide
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines and coding standards
+
+- **[SETUP.md](SETUP.md)** - Detailed setup instructions
+
+<details>
+<summary>In Russian</summary>
+
+Для получения более подробной информации по конкретным темам см.:
+
+- **[TECH_STACK-RU.md](TECH_STACK-RU.md)** / **[TECH_STACK.md](TECH_STACK.md)** - Исчерпывающее руководство по технологическому стеку
+  - Система сборки и управления пакетами (MSBuild, NuGet, Решение .NET)
+  - Система авторизации (ASP.NET Core Identity, JWT, Supabase)
+  - Полное соответствие технологий от React к C#
+  - Процесс разработки и развертывание в продакшн
+  
+- **[README-RU.md](README-RU.md)** / **[README.md](README.md)** - Обзор проекта и руководство по началу работы
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Руководство по участию и стандарты кодирования
+
+- **[SETUP.md](SETUP.md)** - Подробные инструкции по настройке
 </details>
 
 ## References / Ссылки
