@@ -84,6 +84,8 @@ See [Constitution Principle I](.specify/memory/constitution.md) for complete det
 
 ## Tech Stack
 
+> **📖 Detailed Documentation**: For a comprehensive guide to the technology stack, build system, and authorization, see [TECH_STACK.md](TECH_STACK.md)
+
 -   .NET 9.0 or later
 -   C# 13.0
 -   Blazor WebAssembly (Frontend)
