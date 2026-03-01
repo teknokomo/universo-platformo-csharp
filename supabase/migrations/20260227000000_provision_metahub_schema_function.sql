@@ -29,6 +29,8 @@ DECLARE
     v_branch_id       uuid;
     v_now             timestamptz := now();
     v_branch_name     jsonb;
+    v_tables          text[];
+    v_tbl             text;
 BEGIN
     -- ── 1. Derive schema name ─────────────────────────────────────────────
     v_schema_name := 'mhb_' || replace(p_metahub_id::text, '-', '') || '_b1';
@@ -37,8 +39,8 @@ BEGIN
     EXECUTE format('CREATE SCHEMA IF NOT EXISTS %I', v_schema_name);
 
     -- ── 3. Grant usage so authenticated role can query it in the future ───
+    --      anon is intentionally excluded: private metahub schemas require auth.
     EXECUTE format('GRANT USAGE ON SCHEMA %I TO authenticated', v_schema_name);
-    EXECUTE format('GRANT USAGE ON SCHEMA %I TO anon', v_schema_name);
 
     -- ── 4. Provision standard tables ──────────────────────────────────────
 
@@ -201,8 +203,43 @@ BEGIN
     $sql$, v_schema_name);
 
     -- ── 5. Grant table-level privileges ───────────────────────────────────
+    --      anon gets no access; RLS (step 5.1) handles per-user isolation.
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA %I TO authenticated', v_schema_name);
-    EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO anon', v_schema_name);
+
+    -- ── 5.1. Enable RLS and add metahub-membership policies ───────────────
+    --       Only users listed in metahubs.metahubs_users for this metahub
+    --       can read or write data in its private schema tables.
+    v_tables := ARRAY[
+        '_mhb_objects', '_mhb_attributes', '_mhb_enum_values',
+        '_mhb_elements', '_mhb_layouts', '_mhb_widgets',
+        '_mhb_settings', '_mhb_migrations'
+    ];
+    FOREACH v_tbl IN ARRAY v_tables LOOP
+        EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY', v_schema_name, v_tbl);
+        EXECUTE format(
+            $pol$
+            CREATE POLICY metahub_members_only ON %I.%I
+            AS PERMISSIVE FOR ALL TO authenticated
+            USING (
+                EXISTS (
+                    SELECT 1 FROM metahubs.metahubs_users mu
+                    WHERE mu.metahub_id = %L
+                      AND mu.user_id = auth.uid()
+                      AND mu._upl_deleted = false
+                )
+            )
+            WITH CHECK (
+                EXISTS (
+                    SELECT 1 FROM metahubs.metahubs_users mu
+                    WHERE mu.metahub_id = %L
+                      AND mu.user_id = auth.uid()
+                      AND mu._upl_deleted = false
+                )
+            )
+            $pol$,
+            v_schema_name, v_tbl, p_metahub_id, p_metahub_id
+        );
+    END LOOP;
 
     -- ── 6. Insert default branch record ───────────────────────────────────
     v_branch_id   := gen_random_uuid();

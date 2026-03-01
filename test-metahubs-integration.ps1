@@ -45,8 +45,22 @@ $testMetahub = @"
 {
     "id": "$metahubId",
     "codename": "$codename",
-    "name": {"en":"Test Metahub","ru":"Test Metahub"},
-    "description": {"en":"DB integration test","ru":"DB integration test"},
+    "name": {
+        "_schema": "1",
+        "locales": {
+            "en": { "content": "Test Metahub" },
+            "ru": { "content": "Test Metahub" }
+        },
+        "_primary": "ru"
+    },
+    "description": {
+        "_schema": "1",
+        "locales": {
+            "en": { "content": "DB integration test" },
+            "ru": { "content": "DB integration test" }
+        },
+        "_primary": "ru"
+    },
     "is_public": true,
     "last_branch_number": 0
 }
@@ -79,8 +93,11 @@ try {
     Write-Host "✓ Found $($allMetahubs.Count) metahub(s)" -ForegroundColor Green
     
     foreach ($mh in $allMetahubs) {
-        $nameObj = $mh.name | ConvertFrom-Json
-        $name = if ($nameObj.ru) { $nameObj.ru } elseif ($nameObj.en) { $nameObj.en } else { "N/A" }
+        # $mh.name is already a PSCustomObject (PostgREST returns JSONB as JSON)
+        # LocalizedContent format: { "_schema": "1", "locales": { "ru": { "content": "..." } }, "_primary": "ru" }
+        $name = if ($mh.name.locales.ru.content) { $mh.name.locales.ru.content }
+                elseif ($mh.name.locales.en.content) { $mh.name.locales.en.content }
+                else { "N/A" }
         Write-Host "  - $name ($($mh.codename))" -ForegroundColor Gray
     }
     Write-Host ""
