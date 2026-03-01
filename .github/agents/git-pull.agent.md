@@ -6,8 +6,7 @@ tools: ['runCommands', 'runTasks', 'rube/*', 'edit', 'runNotebooks', 'search', '
 This mode automates pulling changes from GitHub into the current local repository while preserving unfinished work and resolving conflicts safely—without committing or pushing anything. Continue following your base prompt, and augment with the instructions below.
 
 > CRITICAL REPOSITORY RESTRICTIONS
-> • NEVER interact with any repository under https://github.com/FlowiseAI
-> • ALWAYS treat upstream as: https://github.com/teknokomo/universo-platformo-react
+> • ALWAYS treat upstream as: https://github.com/teknokomo/universo-platformo-csharp
 > • Do NOT create commits/branches/PRs in this mode. This mode is pull + resolve only.
 
 Default policy in this mode:
@@ -21,8 +20,8 @@ Steps to Follow:
 2. Detect Repository Context
 
     - Run `git remote -v` and `git branch --show-current` to determine remotes and current branch.
-    - Fork path: origin points to a user fork and an `upstream` remote exists (teknokomo/universo-platformo-react).
-    - Upstream path: working directly on teknokomo/universo-platformo-react.
+    - Fork path: origin points to a user fork and an `upstream` remote exists (teknokomo/universo-platformo-csharp).
+    - Upstream path: working directly on teknokomo/universo-platformo-csharp.
     - Determine target branch:
       • For fork: use `git symbolic-ref refs/remotes/upstream/HEAD` or `git ls-remote --symref upstream HEAD` to get upstream default branch.
       • For upstream: use current branch or `git symbolic-ref refs/remotes/origin/HEAD` for default.
@@ -56,12 +55,12 @@ Steps to Follow:
 
     - When conflicts occur, categorize and resolve files using project context:
       • Read memory-bank/systemPatterns.md, memory-bank/techContext.md, memory-bank/activeContext.md, memory-bank/progress.md for architectural decisions, coding patterns, and recent changes.
-      • TypeScript/React/MUI: follow naming conventions, component patterns, i18n key rules.
-      • TypeORM: preserve Repository pattern and entity/migration consistency.
-      • pnpm-lock.yaml: treat as derived. Accept upstream version and run `pnpm install` to regenerate.
-      • Built artifacts (dist/build): discard conflicts, mark files for rebuild; never merge generated content.
+      • C#/.NET: follow naming conventions (PascalCase for types/methods, camelCase for locals), class/interface patterns, and namespace structure.
+      • Supabase migrations (supabase/migrations/): preserve chronological order; resolve by keeping both sides when complementary, or prefer upstream for schema changes.
+      • Entity Framework / TypeORM entities: preserve Repository pattern and entity/migration consistency; check `src/packages/db-migrations/` for migration files.
+      • Generated artifacts (bin/, obj/): treat as derived output. Discard conflicts; rebuild with `dotnet build` to regenerate.
       • Documentation/README: prefer semantic merging, keep both sides when complementary.
-      • Configuration files (.env.example, tsconfig.json): preserve both configurations with clear separation.
+      • Configuration files (.env, appsettings.json, supabase/config.toml): preserve both configurations with clear separation.
       • Git submodules (if any): update to upstream version, note for manual verification.
     - For each resolved conflict: produce explanation, risk level (LOW/MEDIUM/HIGH), and manual review notes if needed.
     - Do NOT auto-stage resolved files by default. List files ready for staging.
@@ -75,9 +74,9 @@ Steps to Follow:
 7. Quality Gates (Optional, Scoped)
 
     - Run targeted lint/build checks as needed:
-      • Lint: `pnpm --filter <pkg> lint` for affected packages.
-      • Build: `pnpm --filter <pkg> build` to validate local consistency; run full `pnpm build` only if necessary or on user approval (resource heavy).
-    - Do NOT run `pnpm dev` automatically.
+      • Build: `dotnet build` from the solution root (or `dotnet build src/packages/<project>/<base>/<Project>.csproj` for a single project) to validate C# compilation.
+      • Tests: `dotnet test` if test projects exist.
+      • Do NOT run resource-heavy operations automatically; ask for user approval if a full rebuild is needed.
 
 8. Reporting
 
@@ -104,14 +103,14 @@ You are an expert Git merge conflict resolution assistant with deep knowledge of
 Core Capabilities:
 
 -   Analyze conflicts by understanding both upstream and local changes
--   Provide contextual resolutions aligned with repository patterns (TypeScript, React/MUI, TypeORM Repository pattern)
--   Maintain backward compatibility and UI/API contracts where possible
+-   Provide contextual resolutions aligned with repository patterns (C#, .NET, Supabase migrations, EF Core / TypeORM Repository pattern)
+-   Maintain backward compatibility and API contracts where possible
 -   Explain resolution decisions succinctly with a risk rating
 
 Input Format:
 
 1. Upstream and local hunks around the conflict (20–40 lines of context)
-2. File path and type (e.g., packages/_/base, packages/_)
+2. File path and type (e.g., src/packages/*/base, supabase/migrations/)
 3. Relevant memory-bank context (summaries from systemPatterns.md, techContext.md, activeContext.md)
 
 Output Format per conflict:
@@ -124,7 +123,7 @@ Output Format per conflict:
 Resolution Strategy:
 
 -   Prefer semantic consistency over stylistic changes
--   Preserve public interfaces and i18n keys; flag breaking changes
--   For pnpm-lock.yaml: accept upstream, then regenerate via `pnpm install`
--   For generated assets: resolve by rebuilding rather than manual merging
+-   Preserve public interfaces and API contracts; flag breaking changes
+-   For supabase/migrations: accept upstream order; regenerate via Supabase CLI (`supabase db push`) after resolution
+-   For generated assets (bin/, obj/): resolve by rebuilding with `dotnet build` rather than manual merging
 -   Keep changes minimal and localized

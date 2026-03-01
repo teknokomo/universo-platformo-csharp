@@ -18,14 +18,8 @@ Continue following your **base prompt**, and augment with the instructions below
 > • Commit messages, issue bodies, and PR descriptions must contain **only** project-relevant information.  
 > • If a PR or issue template injects such text automatically, delete that text before submitting.
 >
-> **CRITICAL REPOSITORY RESTRICTIONS**  
-> • **NEVER** create issues, commits, branches, or pull requests in any repository under https://github.com/FlowiseAI  
-> • **NEVER** push changes to https://github.com/FlowiseAI/Flowise or any other FlowiseAI repository  
-> • **ALWAYS** verify repository URL before any GitHub operations to ensure it's not a FlowiseAI repository  
-> • If the current repository is a FlowiseAI repository, **ABORT** all git operations and inform the user
->
 > **UPSTREAM REPOSITORY**  
-> • **ALWAYS** work with the upstream repository: https://github.com/teknokomo/universo-platformo-react  
+> • **ALWAYS** work with the upstream repository: https://github.com/teknokomo/universo-platformo-csharp  
 > • All GitHub issues must be created in the upstream repository  
 > • All pull requests must target the upstream repository's main branch
 
@@ -38,13 +32,14 @@ Continue following your **base prompt**, and augment with the instructions below
     - **Repository Type Detection**:
 
         - Run `git remote -v` and `git branch --show-current` to determine remotes and current branch
-        - Fork path: origin points to a user fork and an `upstream` remote exists (teknokomo/universo-platformo-react)
-        - Upstream path: working directly on teknokomo/universo-platformo-react
+        - Fork path: origin points to a user fork and an `upstream` remote exists (teknokomo/universo-platformo-csharp)
+        - Upstream path: working directly on teknokomo/universo-platformo-csharp
         - Determine default branch:
           • For fork: use `git symbolic-ref refs/remotes/upstream/HEAD` or `git ls-remote --symref upstream HEAD` to get upstream default branch
           • For upstream: use `git symbolic-ref refs/remotes/origin/HEAD` for default
           • Fallback chain: `git remote show <remote>` (parse "HEAD branch"), then 'main', then 'master' (verify existence with `git ls-remote`)
         - Verify upstream availability: run `git ls-remote upstream` to ensure remote is accessible (fork path only)
+        - This project uses C#/.NET and Supabase (no pnpm/Node.js tooling)
 
     - **Push Permission Detection**:
 
@@ -84,7 +79,7 @@ Continue following your **base prompt**, and augment with the instructions below
     - **Base Issue content on analysis from Step 3** - use the understanding of changes to write accurate descriptions
     - **FIRST: Fetch repository labels** using GitHub API tools to get current list of available labels
     - Use **MCP GitHub tools** (such as `mcp_RUBE_MULTI_EXECUTE_TOOL` with GitHub tool slugs via MCP Rube hub, or direct MCP GitHub tools like `mcp_GitHub_create_issue`) to create the issue
-    - Target repository: `teknokomo/universo-platformo-react` (upstream)
+    - Target repository: `teknokomo/universo-platformo-csharp` (upstream)
     - Follow the format from `.gemini/rules/github-issues.md` (English main text + Russian in spoiler)
     - Focus on the **main functionality** implemented (not documentation or memory bank updates)
     - Use future tense as if describing work to be completed
@@ -143,10 +138,9 @@ Continue following your **base prompt**, and augment with the instructions below
         - **Missing Upstream Remote**: If upstream not configured, restrict to origin (fork) only
 
     - **Guard Rails**:
-        - **NEVER** push to any repository under `github.com/FlowiseAI/*`
         - **NEVER** push directly to main/master branches without explicit user override
         - **ALWAYS** use `-u` flag on first push to establish tracking relationship
-        - **VERIFY** push destination before execution: confirm remote URL is not a FlowiseAI repository
+        - **VERIFY** push destination before execution: confirm remote URL matches `teknokomo/universo-platformo-csharp` or a personal fork thereof
 
 8. **Create Pull Request to Upstream**:
 
@@ -154,10 +148,10 @@ Continue following your **base prompt**, and augment with the instructions below
     - **Use the same fetched labels from Step 4** - no need to fetch again
     - Use **MCP GitHub tools** (such as `mcp_RUBE_MULTI_EXECUTE_TOOL` with GitHub tool slugs via MCP Rube hub, or direct MCP GitHub tools like `mcp_GitHub_create_pull_request`) to create PR
     - **Source Branch Selection** (based on Step 7 push destination):
-        - **If pushed to upstream**: Source = `teknokomo/universo-platformo-react:<branch-name>`
-        - **If pushed to fork**: Source = `<your-username>/universo-platformo-react:<branch-name>`
+        - **If pushed to upstream**: Source = `teknokomo/universo-platformo-csharp:<branch-name>`
+        - **If pushed to fork**: Source = `<your-username>/universo-platformo-csharp:<branch-name>`
         - **Fallback handling**: If upstream PR creation fails (e.g. policy requires fork-based PRs), automatically retry with fork source
-    - Target: `main` branch in `teknokomo/universo-platformo-react` (upstream)
+    - Target: `main` branch in `teknokomo/universo-platformo-csharp` (upstream)
     - **PR Title Format**: Start with `GH{issue_number} ` followed by descriptive title
     - Follow the format from `.gemini/rules/github-pr.md` for PR description (not github-issues.md)
     - **Apply appropriate labels** according to `.gemini/rules/github-labels.md`:
@@ -203,13 +197,6 @@ When working with only some of the changed files (partial commits):
 
 **Enhanced Error Handling and Guardrails**:
 
-**Critical Repository Guards**:
-
--   **ALWAYS** verify repository URL before ANY GitHub operations to ensure it's not a FlowiseAI repository
--   **NEVER** create issues, commits, branches, or pull requests in any repository under https://github.com/FlowiseAI
--   **NEVER** push changes to https://github.com/FlowiseAI/Flowise or any other FlowiseAI repository
--   **If current repository is FlowiseAI**: ABORT all git operations and inform user immediately
-
 **Push Error Recovery**:
 
 -   **Permission Denied**: "Upstream push failed: Permission denied. Falling back to fork push: origin/<branch>"
@@ -221,8 +208,8 @@ When working with only some of the changed files (partial commits):
 **GitHub API Error Recovery**:
 
 -   **MCP Tools Failure**: Provide clear error message with manual URLs:
-    • Issue creation: `https://github.com/teknokomo/universo-platformo-react/issues/new`
-    • PR creation: `https://github.com/teknokomo/universo-platformo-react/compare/main...<branch>`
+    • Issue creation: `https://github.com/teknokomo/universo-platformo-csharp/issues/new`
+    • PR creation: `https://github.com/teknokomo/universo-platformo-csharp/compare/main...<branch>`
 -   **Rate Limiting**: Wait and retry with backoff, inform user of delays
 -   **Repository Not Found**: Verify upstream configuration, suggest adding upstream remote
 -   **Insufficient Permissions**: Explain limitation, suggest requesting access or using fork workflow
@@ -266,7 +253,8 @@ When working with only some of the changed files (partial commits):
 -   **"Permission denied" on upstream push**: Normal for contributors; mode automatically falls back to fork workflow
 -   **"Branch protection" errors**: Expected for main/protected branches; mode creates feature branch or uses fork
 -   **"MCP GitHub tools unavailable"**: Use provided manual URLs for issue/PR creation, continue with git operations
--   **"Upstream remote not found"**: Run `git remote add upstream https://github.com/teknokomo/universo-platformo-react.git`
+-   **"Upstream remote not found"**: Run `git remote add upstream https://github.com/teknokomo/universo-platformo-csharp.git`
 -   **"Dry-run shows permission but actual push fails"**: Branch protection rules; mode handles gracefully with fork fallback
+-   **Build validation**: Use `dotnet build src/packages/<project>/<base>` to validate C# projects before push; run full solution build with `dotnet build` from within the appropriate `.sln` directory if needed
 
 _Goal: This mode should fully automate final code delivery to GitHub, creating all necessary tracking artifacts (issue, commit, PR) with minimal human intervention._

@@ -263,19 +263,21 @@ Each implementation shares the same core concepts and goals while leveraging the
     dotnet restore
     ```
 
-3. Set up environment variables
+3. Set up Supabase authentication
 
-    - Create `appsettings.Development.json` in backend projects
-    - Add required Supabase configuration:
+    - Create a Supabase project at [supabase.com](https://supabase.com)
+    - Edit `src/packages/main-frt/base/wwwroot/appsettings.json`:
         ```json
         {
           "Supabase": {
-            "Url": "your_supabase_url",
-            "AnonKey": "your_supabase_anon_key",
-            "JwtSecret": "your_supabase_jwt_secret"
+            "Url": "https://your-project.supabase.co",
+            "Key": "your-anon-key-here",
+            "AutoRefreshToken": true,
+            "PersistSession": true
           }
         }
         ```
+    - See [SUPABASE_AUTH_SETUP.md](docs/SUPABASE_AUTH_SETUP.md) for detailed setup instructions
 
 4. Build the project
 
@@ -286,17 +288,29 @@ Each implementation shares the same core concepts and goals while leveraging the
 5. Run the application
 
     ```bash
-    dotnet run --project src/packages/main-srv/base
+    dotnet run --project src/packages/main-frt/base
     ```
 
-6. Access the application at [https://localhost:5001](https://localhost:5001)
+6. Access the application at [http://localhost:5000](http://localhost:5000)
+
+### Authentication Features
+
+The project now includes a complete Supabase authentication system:
+
+- **Sign Up**: Create new accounts at `/register`
+- **Sign In**: Login at `/login`
+- **Protected Routes**: Use `[Authorize]` attribute on pages
+- **User Menu**: Access profile and logout in the top-right corner
+- **Session Management**: Auto-refresh tokens and persistent sessions
+
+See the [Authentication Setup Guide](docs/SUPABASE_AUTH_SETUP.md) for testing the authentication flow.
 
 ### Development Mode
 
 For development with hot-reloading:
 
 ```bash
-dotnet watch --project src/packages/main-srv/base
+dotnet watch --project src/packages/main-frt/base
 ```
 
 ## Roadmap
