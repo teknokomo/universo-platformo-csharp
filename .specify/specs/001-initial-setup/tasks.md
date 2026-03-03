@@ -333,14 +333,14 @@
 - [ ] T142.6 [P] [US-HOST] Configure Swagger/OpenAPI documentation aggregation
 - [ ] T142.7 [US-HOST] Configure CORS for Blazor frontend
 - [ ] T142.8 [US-HOST] Configure JWT authentication middleware
-- [ ] T142.9 [P] [US-HOST] Create appsettings.json with Supabase and database configuration
-- [ ] T142.10 [P] [US-HOST] Create appsettings.Development.json
-- [ ] T142.11 [P] [US-HOST] Create appsettings.Production.json
+- [X] T142.9 [P] [US-HOST] Create appsettings.json with Supabase and database configuration
+- [X] T142.10 [P] [US-HOST] Create appsettings.Development.json
+- [X] T142.11 [P] [US-HOST] Create appsettings.Production.json
 - [ ] T142.12 [US-HOST] Configure Redis distributed caching connection
 - [ ] T142.13 [US-HOST] Configure distributed rate limiting with Redis
 - [X] T142.14 [US-HOST] Add api-host-srv to solution and build
-- [ ] T142.15 [P] [US-HOST] Create Package README.md for api-host-srv (English)
-- [ ] T142.16 [P] [US-HOST] Create Package README-RU.md for api-host-srv (Russian)
+- [X] T142.15 [P] [US-HOST] Create Package README.md for api-host-srv (English)
+- [X] T142.16 [P] [US-HOST] Create Package README-RU.md for api-host-srv (Russian)
 
 ### Frontend Application Shell
 
